@@ -1,0 +1,17 @@
+# ignore all class files
+*.class
+*.txt
+
+# ignore compiled output directories (optional but recommended)
+out/
+build/
+target/
+bin/
+
+# ignore IDE stuff (if you use these)
+# IntelliJ
+.idea/
+*.iml
+
+# VS Code
+.vscode/
