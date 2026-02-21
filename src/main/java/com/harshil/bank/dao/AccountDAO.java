@@ -16,15 +16,15 @@ public class AccountDAO{
     }
 
     public void createAccount(Account account){
-        String sql = "INSERT INTO <table_name> () VALUES ()";
+        // String sql = "INSERT INTO <table_name> () VALUES ()";
 
-        try(PreparedStatement ps = con.prepareStatement(sql)){
+        // try(PreparedStatement ps = con.prepareStatement(sql)){
 
-            ps.executeUpdate();
+        //     ps.executeUpdate();
 
-        }catch(Exception e){
-            e.printStackTrace();
-        }
+        // }catch(Exception e){
+        //     e.printStackTrace();
+        // }
     }
     
 }

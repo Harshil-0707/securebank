@@ -29,7 +29,7 @@ public class BankService{
                 System.out.println("Invalid Email Address!!!");
                 continue;
             }
-            if(null == userDao.searchByEmail(email)) break;
+            if(userDao.existsBy("users",email)) break;
             else System.out.println("Email already exists!!!");
         }
 
@@ -41,15 +41,33 @@ public class BankService{
                 System.out.println("Invalid Phone Number!!!");
                 continue;
             }
-            if(null == userDao.searchByPhone(phoneNumber)) break;
+            if(userDao.existsBy("users",phoneNumber)) break;
             else System.out.println("Phone number already exists!!!");
+        }
+
+        if(userDao.createUser(new User(name,email,phoneNumber))){
+            System.out.println("User created successfully!!!");
         }
 
     }
 
     public void createAccount(Scanner sc){
-        System.out.print("Enter user ID: ");
-        int id = sc.nextInt();
+        int id;
+        while(true){
+            System.out.print("Enter user ID: ");
+            if(!sc.hasNextInt()){
+                System.out.println("ID should be a natural number!!!");
+                sc.nextLine();
+                continue;
+            }
+            id = sc.nextInt();
+            sc.nextLine();
+            if(id < 1){
+                System.out.println("ID should be a natural number!!!");
+                continue;
+            }
+            break;
+        }
         sc.nextLine();
         System.out.print("Enter Account Type (SAVINGS/CURRENT): ");
         String accountType = sc.nextLine();
@@ -61,10 +79,11 @@ public class BankService{
         while(true){
             System.out.print("Enter Account Number: ");
             accountNumber = sc.nextLine();
-            if(!userDao.existsBy("account_number", accountNumber)){
-                System.out.println("Entered account number does not exists!!!");
-                continue;
-            }
+            // if(!userDao.existsBy("", accountNumber)){
+            //     System.out.println("Entered account number does not exists!!!");
+            //     continue;
+            // }
+            break;
         }
 
         double amount = 0;

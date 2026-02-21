@@ -1,3 +1,5 @@
+package com.harshil.bank;
+
 import java.util.Scanner;
 import java.sql.Connection;
 import com.harshil.bank.dao.*;
@@ -13,9 +15,9 @@ public class App{
         Scanner sc = new Scanner(System.in);
 
         try(Connection connection = DBConnection.getConnection()){
-            userDao = new userDao(connection);
-            accountDao = new accountDao(connection);
-            transactionDao = new transactionDao(connection);
+            userDao = new UserDAO(connection);
+            accountDao = new AccountDAO(connection);
+            transactionDao = new TransactionDAO(connection);
 
             BankService bs = new BankService(userDao,accountDao,transactionDao);
 

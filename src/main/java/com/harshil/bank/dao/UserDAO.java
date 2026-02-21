@@ -22,10 +22,18 @@ public class UserDAO{
         int rowsAffected = 0;
 
         try(PreparedStatement ps = con.prepareStatement(sql)){
-            ps.setString(user.getName());
-            ps.setString(user.getemail());
-            ps.setString(user.getPhoneNumber());
+            ps.setString(1,user.getName());
+            ps.setString(2,user.getEmail());
+            ps.setString(3,user.getPhoneNumber());
             rowsAffected = ps.executeUpdate();
+
+            // try(ResultSet rs = ps.getGeneratedKeys()){
+            //     if(rs.next()){
+            //         System.out.println(rs.getInt(0));
+            //         System.out.println(rs.getInt(1));
+            //         System.out.println(rs.getInt(2));
+            //     }
+            // }
 
         }catch(Exception e){
             e.printStackTrace();

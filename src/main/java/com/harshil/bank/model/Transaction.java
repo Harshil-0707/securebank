@@ -1,6 +1,5 @@
 package com.harshil.bank.model;
 
-
 import java.time.LocalDateTime;
 
 public class Transaction{
@@ -30,7 +29,7 @@ public class Transaction{
     }
 
     public void setTransactionType(String transactionType){
-        this.transactiontype = transactionType;
+        this.transactionType = transactionType;
     }
 
     public void setTransactionAmount(double transactionAmount){
@@ -43,24 +42,24 @@ public class Transaction{
 
     // getter
 
-    public int getTransactionId(int transactionId){
+    public int getTransactionId(){
         return this.transactionId;
     }
 
-    public int getAccountNumber(int accountNumber){
+    public int getAccountNumber(){
         return this.accountNumber;
     }
 
-    public String getTransactionType(String transactionType){
-        return this.transactiontype;
+    public String getTransactionType(){
+        return this.transactionType;
     }
 
-    public double getTransactionAmount(double transactionAmount){
+    public double getTransactionAmount(){
         return this.transactionAmount;
     }
 
-    public LocalDateTime getTransactionTime(LocalDateTime transactionTime){
-        return this.transactionAmount;
+    public LocalDateTime getTransactionTime(){
+        return this.transactionTime;
     }
 
 }
