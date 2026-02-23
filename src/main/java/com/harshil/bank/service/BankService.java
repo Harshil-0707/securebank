@@ -29,7 +29,7 @@ public class BankService{
                 System.out.println("Invalid Email Address!!!");
                 continue;
             }
-            if(userDao.existsBy("users",email)) break;
+            if(!userDao.existsBy("email",email)) break;
             else System.out.println("Email already exists!!!");
         }
 
@@ -41,7 +41,7 @@ public class BankService{
                 System.out.println("Invalid Phone Number!!!");
                 continue;
             }
-            if(userDao.existsBy("users",phoneNumber)) break;
+            if(!userDao.existsBy("phone",phoneNumber)) break;
             else System.out.println("Phone number already exists!!!");
         }
 
@@ -66,11 +66,40 @@ public class BankService{
                 System.out.println("ID should be a natural number!!!");
                 continue;
             }
+            if(!userDao.validateUserID(id)) System.out.println("Invalid user ID!!!");
             break;
         }
-        sc.nextLine();
-        System.out.print("Enter Account Type (SAVINGS/CURRENT): ");
-        String accountType = sc.nextLine();
+        
+        String accountType = null;
+        while(true){
+            System.out.print("Enter Account Type (SAVINGS - 1 / CURRENT - 2): ");
+            if(!sc.hasNextInt()){
+                System.out.println("Enter a number 1 or 2!!!");
+                sc.nextLine();
+                continue;
+            }
+            int choice = sc.nextInt();
+            sc.nextLine();
+            switch(choice){
+                case 1:
+                    acocuntType = "SAVINGS";
+                    break;
+                case 2:
+                    acocuntType = "CURRENT";
+                    break;
+                default:
+                    System.out.println("Invalid choice!!!");
+                    continue;
+            }
+            break;
+        }
+
+        Account account = new Account(id,account_type);
+        if(accountDao.createAccount(account)){
+            System.out.println("Account created successfully!!!");
+            System.out.println("Account Number: " + account.getAccountNumber());
+        }
+
     }
 
     public void deposit(Scanner sc){
@@ -79,10 +108,10 @@ public class BankService{
         while(true){
             System.out.print("Enter Account Number: ");
             accountNumber = sc.nextLine();
-            // if(!userDao.existsBy("", accountNumber)){
-            //     System.out.println("Entered account number does not exists!!!");
-            //     continue;
-            // }
+            if(!userDao.existsBy("account_number", accountNumber)){
+                System.out.println("Entered account number does not exists!!!");
+                continue;
+            }
             break;
         }
 

@@ -1,5 +1,7 @@
 package com.harshil.bank.model;
 
+import java.util.UUID;
+
 public class Account{
     private int accountId;
     private int userId;
@@ -8,6 +10,7 @@ public class Account{
     private String accountType;
 
     public Account(int userId,String accountType){
+        this.accountNumber = UUID.randomUUID().substring(0,6);
         this.userId = userId;
         this.accountType = accountType;
     }

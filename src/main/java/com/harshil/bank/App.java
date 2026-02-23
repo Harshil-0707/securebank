@@ -71,6 +71,7 @@ public class App{
                         System.out.println("  Thank you for using SecureBank!");
                         System.out.println("  Goodbye");
                         System.out.println("-----------------------------------------");
+                        System.exit(0);
                         break;
                     default:
                         System.out.println("Invalid choice!!!");

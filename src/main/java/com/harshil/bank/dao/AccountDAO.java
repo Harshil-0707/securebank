@@ -15,16 +15,37 @@ public class AccountDAO{
         this.con = con;
     }
 
-    public void createAccount(Account account){
-        // String sql = "INSERT INTO <table_name> () VALUES ()";
+    public boolean createAccount(Account account){
+        String sql = "INSERT INTO accounts (user_id,account_number,account_type) VALUES (?,?,?)";
 
-        // try(PreparedStatement ps = con.prepareStatement(sql)){
+        int rowsAffected = 0;
 
-        //     ps.executeUpdate();
+        try(PreparedStatement ps = con.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)){
+            ps.setInt(1,account.getUserId());
+            ps.setString(2,account.getAccountNumber());
+            ps.setString(3,account.getAccountType());
+            rowsAffected = ps.executeUpdate();
+            System.out.println(account.getAccountNumber());
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return rowsAffected > 0;
+    }
 
-        // }catch(Exception e){
-        //     e.printStackTrace();
-        // }
+    public boolean existsBy(String fieldName,String value){
+        String sql = "SELECT 1 FROM accounts WHERE " + fieldName + " = ?";
+        try(PreparedStatement ps = con.prepareStatement(sql)){
+            ps.setString(1,value);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateBalance(int amount){
+
     }
     
 }
