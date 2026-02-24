@@ -11,6 +11,8 @@ public class BankService{
     private AccountDAO accountDao = null;
     private TransactionDAO transactionDao = null; 
 
+    // TODO update balance from double to BigDecimal
+
     public BankService(UserDAO userDao,AccountDAO accountDao,TransactionDAO transactionDao){
         this.userDao = userDao;
         this.accountDao = accountDao;
@@ -116,7 +118,6 @@ public class BankService{
         }
 
         double amount = 0;
-
         while(true){
             System.out.print("Enter Amount to Deposit: ");
 
@@ -127,12 +128,15 @@ public class BankService{
             }
             amount = sc.nextDouble();
             sc.nextLine();
-            if(amount < 100){
-                System.out.println("Amount should be more than 100!!!");
+            if(amount < 1){
+                System.out.println("Amount cannot be negative or zero!!!");
                 continue;
             }
             break;
         }
+
+        Transaction t = new Transaction(accountNumber,"deposite",amount);
+        TransactionDAO.deposit(t);
 
         System.out.println("-----------------------------------------");
         System.out.println("Deposit Successful!");

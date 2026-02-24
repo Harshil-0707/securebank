@@ -13,6 +13,8 @@ public class UserDAO{
     
     Connection con = null;
 
+    // TODO update balance from double to BigDecimal
+
     public UserDAO(Connection con){
         this.con = con;
     }

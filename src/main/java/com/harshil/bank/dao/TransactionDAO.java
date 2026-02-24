@@ -15,4 +15,18 @@ public class TransactionDAO{
         this.con = con;
     }
 
+    public boolean deposit(Transaction t){
+        String sql = "INSERT INTO transactions (account_number,type,amount) VALUES (?,?,?)";
+        int rowsAffected = 0;
+        try(PreparedStatement ps = con.prepareStatement(sql)){
+            ps.setString(1,t.getAccountNumber());
+            ps.setString(2,t.getAccountType());
+            ps.setDouble(3,t.getTransactionAmount());
+            rowsAffected = ps.executeUpdate();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return rowsAffected > 0;
+    }
+
 }

@@ -11,6 +11,8 @@ public class AccountDAO{
 
     Connection con = null;
 
+    // TODO update balance from double to BigDecimal
+
     public AccountDAO(Connection con){
         this.con = con;
     }
@@ -44,8 +46,35 @@ public class AccountDAO{
         return false;
     }
 
-    public boolean updateBalance(int amount){
+    public boolean updateBalance(double amount,String accountNumber){
+        String sql = "UPDATE balance SET balance = balance + ? WHERE account_number = ?";
+        int rowsAffected = 0;
+        try(PreparedStatement ps = con.prepareStatement(sql)){
+            ps.setDouble(1,amount);
+            ps.setString(2,accountNumber);
+            rowsAffected = ps.executeUpdate();
 
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return rowsAffected > 0;
     }
     
+    private double getUpdatedAmount(String accountNumber){
+        String sql = "SELECT balance FROM accounts WHERE account_number = ?";
+        try(PreparedStatement ps = con.prepareStatement(sql)){
+            ps.setString(1,accountNumber);
+            try(ResultSet rs = ps.executeQuery()){
+                if(rs.next()){
+                    return rs.getBigDecimal("balance");
+                }
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
+
 }
