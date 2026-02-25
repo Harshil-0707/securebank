@@ -1,5 +1,6 @@
 package com.harshil.bank.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Transaction{
@@ -7,11 +8,11 @@ public class Transaction{
     private int transactionId;
     private String accountNumber;
     private String transactionType;
-    private double transactionAmount;
+    private BigDecimal transactionAmount;
     private LocalDateTime transactionTime;
 
 
-    public Transaction(String accountNumber,String transactionType,double transactionAmount){
+    public Transaction(String accountNumber,String transactionType,BigDecimal transactionAmount){
         this.accountNumber = accountNumber;
         this.transactionType = transactionType;
         this.transactionAmount = transactionAmount;
@@ -31,7 +32,7 @@ public class Transaction{
         this.transactionType = transactionType;
     }
 
-    public void setTransactionAmount(double transactionAmount){
+    public void setTransactionAmount(BigDecimal transactionAmount){
         this.transactionAmount = transactionAmount;
     }
 
@@ -53,7 +54,7 @@ public class Transaction{
         return this.transactionType;
     }
 
-    public double getTransactionAmount(){
+    public BigDecimal getTransactionAmount(){
         return this.transactionAmount;
     }
 

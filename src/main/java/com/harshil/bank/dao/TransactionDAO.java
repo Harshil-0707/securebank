@@ -21,7 +21,7 @@ public class TransactionDAO{
         try(PreparedStatement ps = con.prepareStatement(sql)){
             ps.setString(1,t.getAccountNumber());
             ps.setString(2,t.getAccountType());
-            ps.setDouble(3,t.getTransactionAmount());
+            ps.setBigDecimal(3,t.getTransactionAmount());
             rowsAffected = ps.executeUpdate();
         }catch(Exception e){
             e.printStackTrace();

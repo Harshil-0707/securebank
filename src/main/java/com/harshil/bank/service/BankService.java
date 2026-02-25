@@ -2,6 +2,8 @@ package com.harshil.bank.service;
 
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.math.BigDecimal;
+
 import com.harshil.bank.dao.*;
 import com.harshil.bank.model.*;
 
@@ -19,6 +21,55 @@ public class BankService{
         this.transactionDao = transactionDao;
     }
     
+    private String getAccountNumberFromUser(Scanner sc){
+        String accountNumber = null;
+        while(true){
+            System.out.print("Enter Account Number: ");
+            accountNumber = sc.nextLine();
+            if(!userDao.existsBy("account_number", accountNumber)){
+                System.out.println("Entered account number does not exists!!!");
+                continue;
+            }
+            break;
+        }
+        return accountNumber;
+    }
+
+    private BigDecimal getAmountFromUser(Scanner sc,String txt){
+        BigDecimal amount = null;
+        while(true){
+            System.out.print(txt);
+
+            String amountString = sc.nextLine();
+            try{
+                amount = new BigDecimal(amountString);
+            }catch(NumberFormatException  e){
+                System.out.println("Invalid input. Please enter a valid number.");
+                continue;
+            }
+
+            // Check positive
+            if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+                System.out.println("Amount must be positive.");
+                continue;
+            }
+
+            // Check minimum 100
+            if (amount.compareTo(new BigDecimal("100")) < 0) {
+                System.out.println("Minimum amount is 100.");
+                continue;
+            }
+
+            // Check decimal places
+            if (amount.scale() > 2) {
+                System.out.println("Only 2 decimal places allowed.");
+                continue;
+            }
+            break;
+        }
+        return amount;
+    }
+
     public void createUser(Scanner sc){
         System.out.print("Enter name: ");
         String name = sc.nextLine();
@@ -106,77 +157,26 @@ public class BankService{
 
     public void deposit(Scanner sc){
 
-        String accountNumber = null;
-        while(true){
-            System.out.print("Enter Account Number: ");
-            accountNumber = sc.nextLine();
-            if(!userDao.existsBy("account_number", accountNumber)){
-                System.out.println("Entered account number does not exists!!!");
-                continue;
-            }
-            break;
-        }
+        String accountNumber = getAccountNumberFromUser(sc);
 
-        double amount = 0;
-        while(true){
-            System.out.print("Enter Amount to Deposit: ");
-
-            if(!sc.hasNextDouble() || !sc.hasNextInt()){
-                System.out.println("Amount should be a number!!!");
-                sc.nextLine();
-                continue;
-            }
-            amount = sc.nextDouble();
-            sc.nextLine();
-            if(amount < 1){
-                System.out.println("Amount cannot be negative or zero!!!");
-                continue;
-            }
-            break;
-        }
+        BigDecimal amount = getAmountFromUser(sc,"Enter Amount to Deposit: ");
 
         Transaction t = new Transaction(accountNumber,"deposite",amount);
         TransactionDAO.deposit(t);
 
         System.out.println("-----------------------------------------");
         System.out.println("Deposit Successful!");
-        System.out.println("Deposited Amount: ");
-        System.out.println("Updated Balance: ");
+        System.out.println("Deposited Amount: " + amount);
+        System.out.println("Updated Balance: " +);
         System.out.println("Transaction ID: ");
         System.out.println("-----------------------------------------");
 
     }
 
     public void withdraw(Scanner sc){
-        String accountNumber = null;
-        while(true){
-            System.out.print("Enter Account Number: ");
-            accountNumber = sc.nextLine();
-            if(!userDao.existsBy("account_number", accountNumber)){
-                System.out.println("Entered account number does not exists!!!");
-                continue;
-            }
-            break;
-        }
+        String accountNumber = getAccountNumberFromUser(sc);
+        BigDecimal amount = getAmountFromUser(sc,"Enter Amount to Withdraw: ");
 
-        double amount = 0;
-
-        while(true){
-            System.out.print("Enter Amount to Withdraw: ");
-
-            if(!sc.hasNextDouble() || !sc.hasNextInt()){
-                System.out.println("Amount should be a number!!!");
-                sc.nextLine();
-                continue;
-            }
-            amount = sc.nextDouble();
-            sc.nextLine();
-            if(amount < 100){
-                System.out.println("Amount should be more than 100!!!");
-                continue;
-            }
-            break;
-        }
     }
 
     public void transfer(Scanner sc){

@@ -1,12 +1,13 @@
 package com.harshil.bank.model;
 
 import java.util.UUID;
+import java.math.BigDecimal;
 
 public class Account{
     private int accountId;
     private int userId;
     private String accountNumber;
-    private double balance;
+    private BigDecimal balance;
     private String accountType;
 
     public Account(int userId,String accountType){
@@ -29,7 +30,7 @@ public class Account{
         this.accountNumber = accountNumber;
     }
 
-    public void setBalance(double balance){
+    public void setBalance(BigDecimal balance){
         this.balance = balance;
     }
 
@@ -51,7 +52,7 @@ public class Account{
         return this.accountNumber;
     }
 
-    public double getBalance(){
+    public BigDecimal getBalance(){
         return this.balance;
     }
 
