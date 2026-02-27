@@ -25,10 +25,17 @@ public class TransactionDAO{
         int rowsAffected = 0;
         try(PreparedStatement ps = con.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)){
             ps.setString(1,t.getAccountNumber());
-            ps.setString(2,t.getAccountType());
+            ps.setString(2,t.getTransactionType());
             ps.setBigDecimal(3,t.getTransactionAmount());
             rowsAffected = ps.executeUpdate();
-            t.setTransactionId();
+            try(ResultSet rs = ps.getGeneratedKeys()){
+                if(rs.next()){
+                    int id = rs.getInt(1);
+                    t.setTransactionId(id);
+                }
+            }catch(Exception e){
+                e.printStackTrace();
+            }
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -36,9 +43,9 @@ public class TransactionDAO{
     }
 
     public ArrayList<Transaction> getAllTransactions(String accountNumber){
-        String sql = "SELECT * FROM transactions WHERE account_number = ? ORDER BY transaction_date";
+        String sql = "SELECT * FROM transactions WHERE account_number = ? ORDER BY transaction_date DESC";
 
-        ArrayList<Transaction> transactions = null;
+        ArrayList<Transaction> transactions = new ArrayList<>();
 
         try(PreparedStatement ps = con.prepareStatement(sql)){
             ps.setString(1,accountNumber);
@@ -47,7 +54,7 @@ public class TransactionDAO{
                     int id = rs.getInt("transaction_id");
                     String type = rs.getString("type");
                     BigDecimal amount = rs.getBigDecimal("amount");
-                    LocalDateTime date = rs.getTimeStamp("transaction_date").toLocalDateTime();
+                    LocalDateTime date = rs.getTimestamp("transaction_date").toLocalDateTime();
                     Transaction t = new Transaction(accountNumber,type,amount);
                     t.setTransactionTime(date);
                     t.setTransactionId(id);

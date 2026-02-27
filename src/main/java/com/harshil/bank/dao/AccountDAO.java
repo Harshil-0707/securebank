@@ -45,19 +45,19 @@ public class AccountDAO{
         return false;
     }
 
-    public boolean updateBalance(double amount,String accountNumber,String transactionType){
+    public boolean updateBalance(BigDecimal amount,String accountNumber,String transactionType){
         
         String sql = null;
         if(transactionType.toLowerCase().equals("deposite")){
-            sql = "UPDATE balance SET balance = balance + ? WHERE account_number = ?";
+            sql = "UPDATE accounts SET balance = balance + ? WHERE account_number = ?";
         }else if(transactionType.toLowerCase().equals("withdraw")){
-            sql = "UPDATE balance SET balance = balance - ? WHERE account_number = ?";
+            sql = "UPDATE accounts SET balance = balance - ? WHERE account_number = ?";
         }else{
             return false;
         }
         int rowsAffected = 0;
         try(PreparedStatement ps = con.prepareStatement(sql)){
-            ps.setDouble(1,amount);
+            ps.setBigDecimal(1,amount);
             ps.setString(2,accountNumber);
             rowsAffected = ps.executeUpdate();
         }catch(Exception e){
@@ -82,7 +82,7 @@ public class AccountDAO{
     }
 
     public Account checkBalance(String accountNumber){
-        String sql = "SELECT 1 FROM account WHERE account_number = ?";
+        String sql = "SELECT * FROM accounts WHERE account_number = ?";
         Account a = null;
         try(PreparedStatement ps = con.prepareStatement(sql)){
             ps.setString(1,accountNumber);
@@ -90,7 +90,6 @@ public class AccountDAO{
                 if(rs.next()){
                     int userId = rs.getInt("user_id");
                     String accountType = rs.getString("account_type");
-                    String accountNumber = rs.getString("account_number");
                     BigDecimal balance = rs.getBigDecimal("balance");
                     a = new Account(userId,accountType);
                     a.setAccountNumber(accountNumber);

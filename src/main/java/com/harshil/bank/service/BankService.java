@@ -26,7 +26,7 @@ public class BankService{
         while(true){
             System.out.print("Enter Account Number: ");
             accountNumber = sc.nextLine();
-            if(!userDao.existsBy("account_number", accountNumber)){
+            if(!accountDao.existsBy("account_number", accountNumber)){
                 System.out.println("Entered account number does not exists!!!");
                 continue;
             }
@@ -99,7 +99,7 @@ public class BankService{
         }
 
         if(userDao.createUser(new User(name,email,phoneNumber))){
-            System.out.println("User created successfully!!!");
+            System.out.println("User created successfully!!!\n");
         }
 
     }
@@ -135,10 +135,10 @@ public class BankService{
             sc.nextLine();
             switch(choice){
                 case 1:
-                    acocuntType = "SAVINGS";
+                    accountType = "SAVINGS";
                     break;
                 case 2:
-                    acocuntType = "CURRENT";
+                    accountType = "CURRENT";
                     break;
                 default:
                     System.out.println("Invalid choice!!!");
@@ -147,10 +147,10 @@ public class BankService{
             break;
         }
 
-        Account account = new Account(id,account_type);
+        Account account = new Account(id,accountType);
         if(accountDao.createAccount(account)){
             System.out.println("Account created successfully!!!");
-            System.out.println("Account Number: " + account.getAccountNumber());
+            System.out.println("Account Number: " + account.getAccountNumber() + "\n");
         }
 
     }
@@ -160,17 +160,23 @@ public class BankService{
         String accountNumber = getAccountNumberFromUser(sc);
 
         BigDecimal amount = getAmountFromUser(sc,"Enter Amount to Deposit: ");
-
-        accountDao.updateBalance(amount,accountNumber,"deposite");
+        
+        if(!accountDao.updateBalance(amount,accountNumber,"deposite")){
+            System.out.println("Error: Unable to updating balance!!!");
+            return;
+        }
         Transaction t = new Transaction(accountNumber,"deposite",amount);
-        transactionDao.makeTransaction(t);
+        if(!transactionDao.makeTransaction(t)){
+            System.out.println("Error: Unable to make transaction!!!");
+            return;
+        }
 
         System.out.println("-----------------------------------------");
         System.out.println("Deposit Successful!");
         System.out.println("Deposited Amount: " + amount);
-        System.out.println("Updated Balance: " +"");
-        System.out.println("Transaction ID: "+"");
-        System.out.println("-----------------------------------------");
+        System.out.println("Updated Balance: " + accountDao.getBalance(accountNumber));
+        System.out.println("Transaction ID: "+ t.getTransactionId());
+        System.out.println("-----------------------------------------\n");
 
     }
 
@@ -178,17 +184,9 @@ public class BankService{
         String accountNumber = getAccountNumberFromUser(sc);
         
         BigDecimal amount = getAmountFromUser(sc,"Enter Amount to Withdraw: ");
-        BigDecimal availableBalance = AccountDao.getBalance(accountNumber);
-        if (amount.compareTo(totalBalance) < 0) {
-            System.out.println("Insufficient Balance!");
-            System.out.println("-----------------------------------------");
-            System.out.println("Error: Insufficient Balance!");
-            System.out.println("Deposited Amount: " + amount);
-            System.out.println("Available Balance: " + availableBalance);
-            System.out.println("Transaction Cancelled.");
-            System.out.println("-----------------------------------------");
-            return;
-        }else{
+        BigDecimal availableBalance = accountDao.getBalance(accountNumber);
+        if (amount.compareTo(availableBalance) <= 0) {
+           
             if(!accountDao.updateBalance(amount,accountNumber,"withdraw")){
                 System.out.println("could not withdraw!");
                 return;
@@ -197,13 +195,21 @@ public class BankService{
 
             transactionDao.makeTransaction(t);
 
-
             System.out.println("-----------------------------------------");
             System.out.println("Withdrawal Successful!");
-            System.out.println("Deposited Amount: " + amount);
+            System.out.println("Withdrawn Amount: " + amount);
             System.out.println("Remaining Balance: " + availableBalance.subtract(amount));
-            System.out.println("Transaction ID: "+"");
+            System.out.println("Transaction ID: "+ t.getTransactionId());
+            System.out.println("-----------------------------------------\n");
+        }else{
+            System.out.println("Insufficient Balance!");
             System.out.println("-----------------------------------------");
+            System.out.println("Error: Insufficient Balance!");
+            System.out.println("Deposited Amount: " + amount);
+            System.out.println("Available Balance: " + availableBalance);
+            System.out.println("Transaction Cancelled.");
+            System.out.println("-----------------------------------------\n");
+            return;
         }
 
     }
@@ -215,20 +221,20 @@ public class BankService{
     public void checkBalance(Scanner sc){
         String accountNumber = getAccountNumberFromUser(sc);
 
-        Account a = AccountDao.checkBalance(accountNumber);
+        Account a = accountDao.checkBalance(accountNumber);
 
         System.out.println("-----------------------------------------");
         System.out.println("Account Number: " + accountNumber);
         System.out.println("Account Type: " + a.getAccountType().toUpperCase());
         System.out.println("Current Balance: " + a.getBalance());
-        System.out.println("-----------------------------------------");
+        System.out.println("-----------------------------------------\n");
     }
 
     public void viewTransactionHistory(Scanner sc) {
         String accountNumber = getAccountNumberFromUser(sc);
 
         ArrayList<Transaction> transactionHistory =
-                TransactionDao.getAllTransactions(accountNumber);
+                transactionDao.getAllTransactions(accountNumber);
 
         String line = "------------------------------------------------------------------";
 
@@ -246,11 +252,11 @@ public class BankService{
                     t.getTransactionId(),
                     t.getTransactionType(),
                     t.getTransactionAmount(),
-                    t.getTransactionTime()   // ✅ use get, not set
+                    t.getTransactionTime()
             );
         }
 
-        System.out.println(line);
+        System.out.println(line + "\n");
     }
 
 }

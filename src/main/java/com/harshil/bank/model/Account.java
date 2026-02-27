@@ -11,7 +11,7 @@ public class Account{
     private String accountType;
 
     public Account(int userId,String accountType){
-        this.accountNumber = UUID.randomUUID().substring(0,6);
+        this.accountNumber = UUID.randomUUID().toString().substring(0,6);
         this.userId = userId;
         this.accountType = accountType;
     }

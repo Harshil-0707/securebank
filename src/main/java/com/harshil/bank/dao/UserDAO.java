@@ -39,9 +39,9 @@ public class UserDAO{
     }
 
     public boolean validateUserID(int id){
-        String sql = "SELECT * FROM users WHERE id = ?";
+        String sql = "SELECT * FROM users WHERE user_id = ?";
         try(PreparedStatement ps = con.prepareStatement(sql)){
-            ps.setId(1,id);
+            ps.setInt(1,id);
             ResultSet rs = ps.executeQuery();
             return rs.next();
         }catch(Exception e){
