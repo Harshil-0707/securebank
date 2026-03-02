@@ -21,16 +21,11 @@ public class BankService{
         this.transactionDao = transactionDao;
     }
     
-    private String getAccountNumberFromUser(Scanner sc){
-        String accountNumber = null;
-        while(true){
-            System.out.print("Enter Account Number: ");
-            accountNumber = sc.nextLine();
-            if(!accountDao.existsBy("account_number", accountNumber)){
-                System.out.println("Entered account number does not exists!!!");
-                continue;
-            }
-            break;
+    private String getAccountNumberFromUser(Scanner sc,String txt){
+        System.out.print(txt);
+        String accountNumber = sc.nextLine();
+        if(!accountDao.existsBy("account_number", accountNumber)){
+            System.out.println("Entered account number does not exists!!!");
         }
         return accountNumber;
     }
@@ -157,7 +152,8 @@ public class BankService{
 
     public void deposit(Scanner sc){
 
-        String accountNumber = getAccountNumberFromUser(sc);
+        String accountNumber = getAccountNumberFromUser(sc,"Enter Account Number: ");
+        if(accountNumber == null) return;
 
         BigDecimal amount = getAmountFromUser(sc,"Enter Amount to Deposit: ");
         
@@ -181,7 +177,11 @@ public class BankService{
     }
 
     public void withdraw(Scanner sc){
-        String accountNumber = getAccountNumberFromUser(sc);
+        
+        String accountNumber = getAccountNumberFromUser(sc,"Enter Account Number: ");
+        if(accountNumber == null){
+            return;
+        }
         
         BigDecimal amount = getAmountFromUser(sc,"Enter Amount to Withdraw: ");
         BigDecimal availableBalance = accountDao.getBalance(accountNumber);
@@ -215,11 +215,63 @@ public class BankService{
     }
 
     public void transfer(Scanner sc){
+        String senderAccountNumber = getAccountNumberFromUser(sc,"Enter Sender Account Number: ");
+        if(senderAccountNumber == null) {
+            System.out.println("Transfer Failed!");
+            return;
+        }
+        String receiverAccountNumber = getAccountNumberFromUser(sc,"Enter Receiver Account Number: ");
+        if(receiverAccountNumber == null){
+            System.out.println("Transfer Failed!");
+            return;
+        }
+        if(senderAccountNumber.equals(receiverAccountNumber)){
+            System.out.println("Sender and Receiver's account numbers cannot be same!!!");
+            return;
+        }
+            
+        BigDecimal amount = getAmountFromUser(sc,"Enter Amount to Transfer: ");
 
+        BigDecimal senderAvailableBalance = accountDao.getBalance(senderAccountNumber);
+        if (amount.compareTo(senderAvailableBalance) > 0) {
+            System.out.println("Error: Insufficient Balance!");
+            System.out.println("Transfer Failed!");
+            return;
+        }
+
+        System.out.println("\n-----------------------------------------");
+        System.out.println("Processing Transfer...");
+        System.out.println("-----------------------------------------");
+        System.out.println("Debiting Sender Account...");
+        if(!accountDao.updateBalance(amount,senderAccountNumber,"withdraw")){
+            System.out.println("Could not Transfer money from sender's account!!!");
+            return;
+        }
+        System.out.println("Crediting Receiver Account...");
+        if(!accountDao.updateBalance(amount,receiverAccountNumber,"deposite")){
+            System.out.println("Could not Transfer money to receiver's account!!!");
+            return;
+        }
+        System.out.println("Recording Transactions...\n");
+
+        Transaction t = new Transaction(senderAccountNumber,"Transfer",amount);
+        
+        if(!transactionDao.makeTransaction(t)){
+            System.out.println("Database Error Occurred!");
+            System.out.println("Rolling Back Transaction...");
+            System.out.println("Transfer Failed!");
+            return;
+        }
+        System.out.println("Transfer Successful!");
+        System.out.println("Transferred Amount: " + amount);
+        System.out.println("Sender New Balance: " + (senderAvailableBalance.subtract(amount)));
+        System.out.println("Receiver New Balance: " + (accountDao.getBalance(receiverAccountNumber)));
+        System.out.println("-----------------------------------------");
     }
 
     public void checkBalance(Scanner sc){
-        String accountNumber = getAccountNumberFromUser(sc);
+        String accountNumber = getAccountNumberFromUser(sc,"Enter Account Number: ");
+        if(accountNumber == null) return;
 
         Account a = accountDao.checkBalance(accountNumber);
 
@@ -231,7 +283,8 @@ public class BankService{
     }
 
     public void viewTransactionHistory(Scanner sc) {
-        String accountNumber = getAccountNumberFromUser(sc);
+        String accountNumber = getAccountNumberFromUser(sc,"Enter Account Number: ");
+        if(accountNumber == null) return;
 
         ArrayList<Transaction> transactionHistory =
                 transactionDao.getAllTransactions(accountNumber);

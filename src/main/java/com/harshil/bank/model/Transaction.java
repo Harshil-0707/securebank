@@ -37,7 +37,7 @@ public class Transaction{
     }
 
     public void setTransactionTime(LocalDateTime transactionTime){
-        this.transactionAmount = transactionAmount;
+        this.transactionTime = transactionTime;
     }
 
     // getter
