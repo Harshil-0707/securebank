@@ -25,7 +25,7 @@ public class TransactionDAO{
         int rowsAffected = 0;
         try(PreparedStatement ps = con.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)){
             ps.setString(1,t.getAccountNumber());
-            ps.setString(2,t.getTransactionType());
+            ps.setString(2,t.getTransactionType().toUpperCase());
             ps.setBigDecimal(3,t.getTransactionAmount());
             rowsAffected = ps.executeUpdate();
             try(ResultSet rs = ps.getGeneratedKeys()){

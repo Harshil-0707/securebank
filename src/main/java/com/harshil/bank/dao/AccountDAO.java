@@ -16,6 +16,10 @@ public class AccountDAO{
         this.con = con;
     }
 
+    public Connection getConnection(){
+        return this.con;
+    }
+
     public boolean createAccount(Account account){
         String sql = "INSERT INTO accounts (user_id,account_number,account_type) VALUES (?,?,?)";
 

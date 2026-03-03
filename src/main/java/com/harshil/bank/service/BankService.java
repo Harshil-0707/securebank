@@ -4,6 +4,8 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.math.BigDecimal;
 
+import java.sql.Connection;
+
 import com.harshil.bank.dao.*;
 import com.harshil.bank.model.*;
 
@@ -239,34 +241,57 @@ public class BankService{
             return;
         }
 
-        System.out.println("\n-----------------------------------------");
-        System.out.println("Processing Transfer...");
-        System.out.println("-----------------------------------------");
-        System.out.println("Debiting Sender Account...");
-        if(!accountDao.updateBalance(amount,senderAccountNumber,"withdraw")){
-            System.out.println("Could not Transfer money from sender's account!!!");
-            return;
-        }
-        System.out.println("Crediting Receiver Account...");
-        if(!accountDao.updateBalance(amount,receiverAccountNumber,"deposite")){
-            System.out.println("Could not Transfer money to receiver's account!!!");
-            return;
-        }
-        System.out.println("Recording Transactions...\n");
+        Connection con = accountDao.getConnection();
 
-        Transaction t = new Transaction(senderAccountNumber,"Transfer",amount);
-        
-        if(!transactionDao.makeTransaction(t)){
-            System.out.println("Database Error Occurred!");
-            System.out.println("Rolling Back Transaction...");
-            System.out.println("Transfer Failed!");
-            return;
+        try{
+            con.setAutoCommit(false);
+
+            System.out.println("\n-----------------------------------------");
+            System.out.println("Processing Transfer...");
+            System.out.println("-----------------------------------------");
+            
+            if(!accountDao.updateBalance(amount,senderAccountNumber,"withdraw")){
+                throw new RuntimeException("Could not Transfer money from sender's account!!!");
+            }
+           
+            if(!accountDao.updateBalance(amount,receiverAccountNumber,"deposite")){
+                throw new RuntimeException("Could not Transfer money to receiver's account!!!");
+            }
+           
+            Transaction t1 = new Transaction(senderAccountNumber,"TRANSFER_OUT",amount);
+            
+            if(!transactionDao.makeTransaction(t1)){
+                throw new RuntimeException("Transaction record failed");
+            }
+
+            Transaction t2 = new Transaction(receiverAccountNumber,"TRANSFER_IN",amount);
+
+            if(!transactionDao.makeTransaction(t2)){
+                throw new RuntimeException("Transaction record failed");
+            }
+
+            con.commit();
+
+            System.out.println("Transfer Successful!");
+            System.out.println("Transferred Amount: " + amount);
+            System.out.println("Sender New Balance: " + (senderAvailableBalance.subtract(amount)));
+            System.out.println("Receiver New Balance: " + (accountDao.getBalance(receiverAccountNumber)));
+            System.out.println("-----------------------------------------");
+       
+        }catch(Exception e){
+            try {
+                con.rollback();
+                System.out.println("Transfer Failed! Transaction Rolled Back.");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }finally{
+            try {
+                con.setAutoCommit(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        System.out.println("Transfer Successful!");
-        System.out.println("Transferred Amount: " + amount);
-        System.out.println("Sender New Balance: " + (senderAvailableBalance.subtract(amount)));
-        System.out.println("Receiver New Balance: " + (accountDao.getBalance(receiverAccountNumber)));
-        System.out.println("-----------------------------------------");
     }
 
     public void checkBalance(Scanner sc){

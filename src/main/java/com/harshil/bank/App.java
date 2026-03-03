@@ -71,7 +71,6 @@ public class App{
                         System.out.println("  Thank you for using SecureBank!");
                         System.out.println("  Goodbye");
                         System.out.println("-----------------------------------------");
-                        System.exit(0);
                         break;
                     default:
                         System.out.println("Invalid choice!!!");
@@ -79,6 +78,13 @@ public class App{
             }
         }catch(Exception e){
             e.printStackTrace();
+        }finally{
+            try {
+                com.mysql.cj.jdbc.AbandonedConnectionCleanupThread.checkedShutdown();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        
         }
 
         sc.close();
