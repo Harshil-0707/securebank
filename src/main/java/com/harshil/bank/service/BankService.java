@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 
 import java.sql.Connection;
 
+import com.harshil.bank.exception.*;
+
 import com.harshil.bank.dao.*;
 import com.harshil.bank.model.*;
 
@@ -14,8 +16,6 @@ public class BankService{
     private UserDAO userDao = null;
     private AccountDAO accountDao = null;
     private TransactionDAO transactionDao = null; 
-
-    // TODO update balance from double to BigDecimal
 
     public BankService(UserDAO userDao,AccountDAO accountDao,TransactionDAO transactionDao){
         this.userDao = userDao;
@@ -178,7 +178,7 @@ public class BankService{
 
     }
 
-    public void withdraw(Scanner sc){
+    public void withdraw(Scanner sc) throws Exception{
         
         String accountNumber = getAccountNumberFromUser(sc,"Enter Account Number: ");
         if(accountNumber == null){
@@ -187,11 +187,12 @@ public class BankService{
         
         BigDecimal amount = getAmountFromUser(sc,"Enter Amount to Withdraw: ");
         BigDecimal availableBalance = accountDao.getBalance(accountNumber);
-        if (amount.compareTo(availableBalance) <= 0) {
+        BigDecimal minimumBalance = new BigDecimal("500");
+
+        if (availableBalance.subtract(amount).compareTo(minimumBalance) < 0) {
            
             if(!accountDao.updateBalance(amount,accountNumber,"withdraw")){
-                System.out.println("could not withdraw!");
-                return;
+               throw new MinimumBalanceException("Minimum balance of 500 must be maintained.");
             }
             Transaction t = new Transaction(accountNumber,"withdraw",amount);
 
@@ -204,14 +205,9 @@ public class BankService{
             System.out.println("Transaction ID: "+ t.getTransactionId());
             System.out.println("-----------------------------------------\n");
         }else{
-            System.out.println("Insufficient Balance!");
-            System.out.println("-----------------------------------------");
-            System.out.println("Error: Insufficient Balance!");
-            System.out.println("Deposited Amount: " + amount);
-            System.out.println("Available Balance: " + availableBalance);
-            System.out.println("Transaction Cancelled.");
-            System.out.println("-----------------------------------------\n");
-            return;
+            throw new InsufficientBalanceException(
+                "Available balance: " + availableBalance + ", Tried to withdraw: " + amount
+            );
         }
 
     }

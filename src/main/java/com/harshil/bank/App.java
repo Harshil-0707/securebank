@@ -6,6 +6,8 @@ import com.harshil.bank.dao.*;
 import com.harshil.bank.util.DBConnection;
 import com.harshil.bank.service.BankService;
 
+import com.harshil.bank.exception.*;
+
 public class App{
     public static void main(String[] args){
 
@@ -54,7 +56,14 @@ public class App{
                         bs.deposit(sc);
                         break;
                     case 4:
-                        bs.withdraw(sc);
+                        try{
+                            bs.withdraw(sc);
+                        }catch(Exception e){
+                            System.out.println("-----------------------------------------");
+                            System.out.println("Error: " + e.getMessage());
+                            System.out.println("Transaction Cancelled.");
+                            System.out.println("-----------------------------------------");
+                        }
                         break;
                     case 5:
                         bs.transfer(sc);
