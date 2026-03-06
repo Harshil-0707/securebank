@@ -66,7 +66,14 @@ public class App{
                         }
                         break;
                     case 5:
-                        bs.transfer(sc);
+                        try{
+                            bs.transfer(sc);
+                        }catch(Exception e){
+                            System.out.println("-----------------------------------------");
+                            System.out.println("Error: " + e.getMessage());
+                            System.out.println("Transaction Cancelled.");
+                            System.out.println("-----------------------------------------");
+                        }
                         break;
                     case 6:
                         bs.checkBalance(sc);

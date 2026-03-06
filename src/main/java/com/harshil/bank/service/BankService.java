@@ -160,12 +160,12 @@ public class BankService{
         BigDecimal amount = getAmountFromUser(sc,"Enter Amount to Deposit: ");
         
         if(!accountDao.updateBalance(amount,accountNumber,"deposite")){
-            System.out.println("Error: Unable to updating balance!!!");
+            System.out.println("Unable to updating balance!!!");
             return;
         }
         Transaction t = new Transaction(accountNumber,"deposite",amount);
         if(!transactionDao.makeTransaction(t)){
-            System.out.println("Error: Unable to make transaction!!!");
+            System.out.println("Unable to make transaction!!!");
             return;
         }
 
@@ -182,6 +182,7 @@ public class BankService{
         
         String accountNumber = getAccountNumberFromUser(sc,"Enter Account Number: ");
         if(accountNumber == null){
+            System.out.println("Account not found!!!");
             return;
         }
         
@@ -212,7 +213,7 @@ public class BankService{
 
     }
 
-    public void transfer(Scanner sc){
+    public void transfer(Scanner sc) throws Exception {
         String senderAccountNumber = getAccountNumberFromUser(sc,"Enter Sender Account Number: ");
         if(senderAccountNumber == null) {
             System.out.println("Transfer Failed!");
@@ -224,17 +225,16 @@ public class BankService{
             return;
         }
         if(senderAccountNumber.equals(receiverAccountNumber)){
-            System.out.println("Sender and Receiver's account numbers cannot be same!!!");
-            return;
+            throw new SameAccountTransferException("Sender and Receiver's account numbers cannot be same.");
         }
             
         BigDecimal amount = getAmountFromUser(sc,"Enter Amount to Transfer: ");
 
         BigDecimal senderAvailableBalance = accountDao.getBalance(senderAccountNumber);
         if (amount.compareTo(senderAvailableBalance) > 0) {
-            System.out.println("Error: Insufficient Balance!");
-            System.out.println("Transfer Failed!");
-            return;
+            throw new InsufficientBalanceException(
+                "Available balance: " + senderAvailableBalance + ", Tried to withdraw: " + amount
+            );
         }
 
         Connection con = accountDao.getConnection();
