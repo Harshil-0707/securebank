@@ -10,11 +10,15 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.time.LocalDateTime;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.harshil.bank.model.Transaction;
 
 public class TransactionDAO{
     
-    Connection con = null;
+    private Connection con = null;
+    private static final Logger logger = LoggerFactory.getLogger(TransactionDAO.class);
 
     public TransactionDAO(Connection con){
         this.con = con;

@@ -7,13 +7,15 @@ import java.sql.Statement;
 
 import java.time.LocalDateTime;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.harshil.bank.model.User;
 
 public class UserDAO{
     
-    Connection con = null;
-
-    // TODO update balance from double to BigDecimal
+    private Connection con = null;
+    private static final Logger logger = LoggerFactory.getLogger(UserDAO.class);
 
     public UserDAO(Connection con){
         this.con = con;

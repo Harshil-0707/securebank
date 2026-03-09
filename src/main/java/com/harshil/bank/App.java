@@ -2,19 +2,27 @@ package com.harshil.bank;
 
 import java.util.Scanner;
 import java.sql.Connection;
+
 import com.harshil.bank.dao.*;
 import com.harshil.bank.util.DBConnection;
 import com.harshil.bank.service.BankService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.harshil.bank.exception.*;
 
 public class App{
+    private static final Logger logger = LoggerFactory.getLogger(App.class);
+    
     public static void main(String[] args){
 
         UserDAO userDao = null;
         AccountDAO accountDao = null;
         TransactionDAO transactionDao = null;
         Scanner sc = new Scanner(System.in);
+
+        App.logger.info("Banking system started");
 
         try(Connection connection = DBConnection.getConnection()){
             userDao = new UserDAO(connection);
@@ -93,11 +101,17 @@ public class App{
                 }
             }
         }catch(Exception e){
+            App.logger.error("Error:: ",e);
             e.printStackTrace();
         }finally{
             try {
                 com.mysql.cj.jdbc.AbandonedConnectionCleanupThread.checkedShutdown();
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    App.logger.info("Application shutting down");
+                    App.logger.info("Database connection closed");
+                }));
             } catch (Exception e) {
+                App.logger.error("Error closing application ",e);
                 e.printStackTrace();
             }
         

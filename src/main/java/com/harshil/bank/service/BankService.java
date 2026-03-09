@@ -11,18 +11,23 @@ import com.harshil.bank.exception.*;
 import com.harshil.bank.dao.*;
 import com.harshil.bank.model.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class BankService{
 
     private UserDAO userDao = null;
     private AccountDAO accountDao = null;
-    private TransactionDAO transactionDao = null; 
+    private TransactionDAO transactionDao = null;
+
+    private static final Logger logger = LoggerFactory.getLogger(BankService.class);
 
     public BankService(UserDAO userDao,AccountDAO accountDao,TransactionDAO transactionDao){
         this.userDao = userDao;
         this.accountDao = accountDao;
         this.transactionDao = transactionDao;
     }
-    
+
     private String getAccountNumberFromUser(Scanner sc,String txt){
         System.out.print(txt);
         String accountNumber = sc.nextLine();
@@ -175,6 +180,7 @@ public class BankService{
         System.out.println("Updated Balance: " + accountDao.getBalance(accountNumber));
         System.out.println("Transaction ID: "+ t.getTransactionId());
         System.out.println("-----------------------------------------\n");
+        BankService.logger.info("Deposit successful");
 
     }
 
@@ -205,6 +211,9 @@ public class BankService{
             System.out.println("Remaining Balance: " + availableBalance.subtract(amount));
             System.out.println("Transaction ID: "+ t.getTransactionId());
             System.out.println("-----------------------------------------\n");
+
+            BankService.logger.info("Withdrawal successful");
+
         }else{
             throw new InsufficientBalanceException(
                 "Available balance: " + availableBalance + ", Tried to withdraw: " + amount
@@ -253,6 +262,8 @@ public class BankService{
             if(!accountDao.updateBalance(amount,receiverAccountNumber,"deposite")){
                 throw new RuntimeException("Could not Transfer money to receiver's account!!!");
             }
+            
+            BankService.logger.info("Transfer initiated from={} to={} amount={}",senderAccountNumber,receiverAccountNumber,amount);
            
             Transaction t1 = new Transaction(senderAccountNumber,"TRANSFER_OUT",amount);
             
@@ -278,6 +289,7 @@ public class BankService{
             try {
                 con.rollback();
                 System.out.println("Transfer Failed! Transaction Rolled Back.");
+                BankService.logger.error("Transfer failed",e);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -301,6 +313,7 @@ public class BankService{
         System.out.println("Account Type: " + a.getAccountType().toUpperCase());
         System.out.println("Current Balance: " + a.getBalance());
         System.out.println("-----------------------------------------\n");
+        BankService.logger.info("Checked Balance");
     }
 
     public void viewTransactionHistory(Scanner sc) {
@@ -331,6 +344,7 @@ public class BankService{
         }
 
         System.out.println(line + "\n");
+        BankService.logger.info("Viewed Transaction History");
     }
 
 }

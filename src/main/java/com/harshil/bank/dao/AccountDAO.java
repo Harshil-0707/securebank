@@ -1,16 +1,22 @@
 package com.harshil.bank.dao;
 
-import java.sql.PreparedStatement;
 import java.math.BigDecimal;
+
+import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.harshil.bank.model.Account;
 
 public class AccountDAO{
 
-    Connection con = null;
+    private static final Logger logger = LoggerFactory.getLogger(AccountDAO.class);
+
+    private Connection con = null;
 
     public AccountDAO(Connection con){
         this.con = con;
