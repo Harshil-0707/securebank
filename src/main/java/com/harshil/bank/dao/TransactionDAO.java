@@ -38,9 +38,11 @@ public class TransactionDAO{
                     t.setTransactionId(id);
                 }
             }catch(Exception e){
+                TransactionDAO.logger.error("Error setting id for transaction",e);
                 e.printStackTrace();
             }
         }catch(Exception e){
+            TransactionDAO.logger.error("Error inserting transaction into database",e);
             e.printStackTrace();
         }
         return rowsAffected > 0;
@@ -65,9 +67,11 @@ public class TransactionDAO{
                     transactions.add(t);
                 }
             }catch(Exception e){
+                TransactionDAO.logger.error("Error setting transaction details for account number = {}",accountNumber,e);
                 e.printStackTrace();
             }
         }catch(Exception e){
+            TransactionDAO.logger.error("Error getting transaction details for the account number = {}",accountNumber,e);
             e.printStackTrace();
         }
         return transactions;

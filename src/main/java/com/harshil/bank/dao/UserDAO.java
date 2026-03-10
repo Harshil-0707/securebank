@@ -33,8 +33,12 @@ public class UserDAO{
 
             try(ResultSet rs = ps.getGeneratedKeys()){
                 if(rs.next()) System.out.println("User ID: " + rs.getInt(1));
+            }catch(Exception e){
+                UserDAO.logger.error("Error getting user id: ",e);
+                e.printStackTrace();
             }
         }catch(Exception e){
+            UserDAO.logger.error("Error inserting user into database: ",e);
             e.printStackTrace();
         }
         return rowsAffected > 0;
@@ -47,6 +51,7 @@ public class UserDAO{
             ResultSet rs = ps.executeQuery();
             return rs.next();
         }catch(Exception e){
+            UserDAO.logger.error("Error getting user id ={} ",id,e);
             e.printStackTrace();
         }
         return false;
@@ -59,6 +64,7 @@ public class UserDAO{
             ResultSet rs = ps.executeQuery();
             return rs.next();
         }catch(Exception e){
+            UserDAO.logger.error("Error getting user by field name = {} and value = {}",fieldName,value,e);
             e.printStackTrace();
         }
         return false;

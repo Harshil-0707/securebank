@@ -38,6 +38,7 @@ public class AccountDAO{
             rowsAffected = ps.executeUpdate();
             System.out.println(account.getAccountNumber());
         }catch(Exception e){
+            AccountDAO.logger.error("Account creation Error: ",e);
             e.printStackTrace();
         }
         return rowsAffected > 0;
@@ -50,6 +51,7 @@ public class AccountDAO{
             ResultSet rs = ps.executeQuery();
             return rs.next();
         }catch(Exception e){
+            AccountDAO.logger.error("Error in finding record using field name={} and value={}",fieldName,value,e);
             e.printStackTrace();
         }
         return false;
@@ -71,6 +73,7 @@ public class AccountDAO{
             ps.setString(2,accountNumber);
             rowsAffected = ps.executeUpdate();
         }catch(Exception e){
+            AccountDAO.logger.error("Error updating balance: ",e);
             e.printStackTrace();
         }
         return rowsAffected > 0;
@@ -83,9 +86,11 @@ public class AccountDAO{
             try(ResultSet rs = ps.executeQuery()){
                 if(rs.next()) return rs.getBigDecimal("balance");
             }catch(Exception e){
+                AccountDAO.logger.error("Error setting balance for account number={}",accountNumber,e);
                 e.printStackTrace();
             }
         }catch(Exception e){
+            AccountDAO.logger.error("Error etting balance using account number={}",accountNumber,e);
             e.printStackTrace();
         }
         return new BigDecimal("0.0");
@@ -106,9 +111,11 @@ public class AccountDAO{
                     a.setBalance(balance);
                 }
             }catch(Exception e){
+                AccountDAO.logger.error("Error setting account details for account number={}",accountNumber,e);
                 e.printStackTrace();
             }
         }catch(Exception e){
+            AccountDAO.logger.error("Checking balance for account={}",accountNumber,e);
             e.printStackTrace();
         }
         return a;

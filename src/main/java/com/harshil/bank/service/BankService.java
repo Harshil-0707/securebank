@@ -29,12 +29,20 @@ public class BankService{
     }
 
     private String getAccountNumberFromUser(Scanner sc,String txt){
-        System.out.print(txt);
-        String accountNumber = sc.nextLine();
-        if(!accountDao.existsBy("account_number", accountNumber)){
-            System.out.println("Entered account number does not exists!!!");
+        String accountNumber = null;
+        while(true){
+            System.out.print(txt);
+
+            accountNumber = sc.nextLine();
+
+            if(accountNumber.isEmpty()) continue;
+            
+            if(!accountDao.existsBy("account_number", accountNumber)){
+                System.out.println("Entered account number does not exists!!!");
+                accountNumber = null;
+            }
+            return accountNumber;
         }
-        return accountNumber;
     }
 
     private BigDecimal getAmountFromUser(Scanner sc,String txt){
@@ -173,24 +181,22 @@ public class BankService{
             System.out.println("Unable to make transaction!!!");
             return;
         }
-
+        
         System.out.println("-----------------------------------------");
         System.out.println("Deposit Successful!");
         System.out.println("Deposited Amount: " + amount);
         System.out.println("Updated Balance: " + accountDao.getBalance(accountNumber));
         System.out.println("Transaction ID: "+ t.getTransactionId());
         System.out.println("-----------------------------------------\n");
-        BankService.logger.info("Deposit successful");
+
+        BankService.logger.info("Deposit successful account={} amount={}",accountNumber,amount);
 
     }
 
     public void withdraw(Scanner sc) throws Exception{
         
         String accountNumber = getAccountNumberFromUser(sc,"Enter Account Number: ");
-        if(accountNumber == null){
-            System.out.println("Account not found!!!");
-            return;
-        }
+        if(accountNumber == null) return;
         
         BigDecimal amount = getAmountFromUser(sc,"Enter Amount to Withdraw: ");
         BigDecimal availableBalance = accountDao.getBalance(accountNumber);
@@ -198,9 +204,13 @@ public class BankService{
 
         if (availableBalance.subtract(amount).compareTo(minimumBalance) < 0) {
            
+            BankService.logger.info("Withdrawal initiated account={} amount={}", accountNumber,amount);
+
             if(!accountDao.updateBalance(amount,accountNumber,"withdraw")){
-               throw new MinimumBalanceException("Minimum balance of 500 must be maintained.");
+                BankService.logger.warn("Withdraw failed: Minimum balance of 500 must be maintained.");
+                throw new MinimumBalanceException("Minimum balance of 500 must be maintained.");
             }
+
             Transaction t = new Transaction(accountNumber,"withdraw",amount);
 
             transactionDao.makeTransaction(t);
@@ -215,6 +225,7 @@ public class BankService{
             BankService.logger.info("Withdrawal successful");
 
         }else{
+            BankService.logger.warn("Withdarw failed: Available balance is less than withdraw amound.");
             throw new InsufficientBalanceException(
                 "Available balance: " + availableBalance + ", Tried to withdraw: " + amount
             );
@@ -223,17 +234,16 @@ public class BankService{
     }
 
     public void transfer(Scanner sc) throws Exception {
+       
         String senderAccountNumber = getAccountNumberFromUser(sc,"Enter Sender Account Number: ");
-        if(senderAccountNumber == null) {
-            System.out.println("Transfer Failed!");
-            return;
-        }
+        if(senderAccountNumber == null) return;
+       
         String receiverAccountNumber = getAccountNumberFromUser(sc,"Enter Receiver Account Number: ");
-        if(receiverAccountNumber == null){
-            System.out.println("Transfer Failed!");
-            return;
-        }
+        if(receiverAccountNumber == null) return;
+        
         if(senderAccountNumber.equals(receiverAccountNumber)){
+            logger.warn("Transfer failed: sender and receiver account are the same account={}",
+            senderAccountNumber);
             throw new SameAccountTransferException("Sender and Receiver's account numbers cannot be same.");
         }
             
@@ -241,6 +251,7 @@ public class BankService{
 
         BigDecimal senderAvailableBalance = accountDao.getBalance(senderAccountNumber);
         if (amount.compareTo(senderAvailableBalance) > 0) {
+            logger.warn("Transfer failed: Available balance is less than withdraw balance");
             throw new InsufficientBalanceException(
                 "Available balance: " + senderAvailableBalance + ", Tried to withdraw: " + amount
             );
@@ -279,6 +290,8 @@ public class BankService{
 
             con.commit();
 
+            BankService.logger.info("Transfer from={} to={} amount={} successful.",senderAccountNumber,receiverAccountNumber,amount);
+
             System.out.println("Transfer Successful!");
             System.out.println("Transferred Amount: " + amount);
             System.out.println("Sender New Balance: " + (senderAvailableBalance.subtract(amount)));
@@ -289,14 +302,16 @@ public class BankService{
             try {
                 con.rollback();
                 System.out.println("Transfer Failed! Transaction Rolled Back.");
-                BankService.logger.error("Transfer failed",e);
+                BankService.logger.error("Transfer failed: ",e);
             } catch (Exception ex) {
+                BankService.logger.error("Transfer rollback error: ",ex);
                 ex.printStackTrace();
             }
         }finally{
             try {
                 con.setAutoCommit(true);
             } catch (Exception e) {
+                BankService.logger.error("AutoCommit error: ",e);
                 e.printStackTrace();
             }
         }
