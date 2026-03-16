@@ -105,11 +105,9 @@ public class App{
             e.printStackTrace();
         }finally{
             try {
+                App.logger.info("Application shutting down");
+                App.logger.info("Database connection closed");
                 com.mysql.cj.jdbc.AbandonedConnectionCleanupThread.checkedShutdown();
-                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                    App.logger.info("Application shutting down");
-                    App.logger.info("Database connection closed");
-                }));
             } catch (Exception e) {
                 App.logger.error("Error closing application ",e);
                 e.printStackTrace();

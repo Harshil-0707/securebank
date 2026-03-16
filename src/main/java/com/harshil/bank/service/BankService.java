@@ -189,7 +189,7 @@ public class BankService{
         System.out.println("Transaction ID: "+ t.getTransactionId());
         System.out.println("-----------------------------------------\n");
 
-        BankService.logger.info("Deposit successful account={} amount={}",accountNumber,amount);
+        BankService.logger.info("Deposit successful account number = {} amount = {}",accountNumber,amount);
 
     }
 
