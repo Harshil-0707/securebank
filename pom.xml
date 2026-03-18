@@ -12,6 +12,8 @@
     <name>SecureBank</name>
     <description>Console Based Banking Management System</description>
 
+    <packaging>war</packaging>
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -40,19 +42,25 @@
             <scope>compile</scope>
         </dependency>
 
+         <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
-        <plugins>
+        <finalName>securebank</finalName>
 
-            <!-- Compiler Plugin -->
+        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
             </plugin>
 
-            <!-- Exec Plugin to run app -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -61,7 +69,6 @@
                     <mainClass>com.harshil.bank.App</mainClass>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 
