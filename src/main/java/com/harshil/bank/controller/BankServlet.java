@@ -24,19 +24,20 @@ public class BankServlet extends HttpServlet {
         switch (path) {
 
             case "/dashboard":
+            case "/dashboard/":
                 req.getRequestDispatcher("/dashboard.html").forward(req, res);
                 break;
 
-            case "/view-balance":
-                res.getWriter().println("Viewing balance");
+            case "/dashboard/view-balance":
+                req.getRequestDispatcher("/viewBalance.html").forward(req, res);
                 break;
 
-            case "/transfer":
-                res.getWriter().println("Transfer");
+            case "/dashboard/transfer":
+                req.getRequestDispatcher("/transfer.html").forward(req, res);
                 break;
 
-            case "/transactions":
-                res.getWriter().println("Transactions");
+            case "/dashboard/transactions":
+                req.getRequestDispatcher("/transactions.html").forward(req, res);
                 break;
 
             default:
