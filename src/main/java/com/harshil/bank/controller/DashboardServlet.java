@@ -9,6 +9,8 @@ import com.harshil.bank.dto.ResponseData;
 
 @WebServlet("/bank/dashboard/api/")
 public class DashboardServlet extends HttpServlet{
+
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 

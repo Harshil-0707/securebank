@@ -8,6 +8,7 @@ import java.io.*;
 @WebServlet("/home")
 public class HomeServlet extends HttpServlet {
 
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
