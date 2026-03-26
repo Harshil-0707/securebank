@@ -85,6 +85,11 @@
         a:hover {
             text-decoration: underline;
         }
+
+        .error {
+            text-align: left;
+            color: rgb(232, 28, 28);
+        }
     </style>
 </head>
 
@@ -93,15 +98,27 @@
     <div class="container">
         <h2>Sign Up</h2>
 
-        <form>
-            <label>Name</label>
-            <input type="text" name="name" placeholder="Enter your name">
+        <form onsubmit="handleSubmit(event)">
+            <label for="name">
+                Name : <input type="text" name="name" id="name" placeholder="Enter your name" required>
+            </label>
 
-            <label>Email</label>
-            <input type="text" name="email" placeholder="Enter your email">
+            <label for="email">
+                Email : <input type="email" name="email" id="email" placeholder="Enter your email" required>
+            </label>
+            <p class="error" id="emailError"></p>
 
-            <label>Password</label>
-            <input type="password" name="password" placeholder="Create your password">
+            <label for="phoneNumber">
+                Phone Number : <input type="text" name="phoneNumber" id="phoneNumber"
+                    placeholder="Enter your phone number" required>
+            </label>
+            <p class="error" id="phoneNumberError"></p>
+
+            <label for="password">
+                Password : <input type="password" id="password" name="password" placeholder="Create your password"
+                    required minlength="6" maxlength="8">
+            </label>
+            <p class="error" id="passwordError"></p>
 
             <button type="submit">Sign Up</button>
         </form>
@@ -110,5 +127,63 @@
     </div>
 
 </body>
+
+<script>
+    function handleSubmit(e) {
+        e.preventDefault();
+
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const phoneNumber = docuemnt.getElementById("phoneNumber").value;
+
+        const emailError = document.getElementById("emailError");
+        const passwordError = document.getElementById("passwordError");
+        const phoneNumberError = document.getElementById("phoneNumberError");
+
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        if (!emailRegex.test(email)) {
+            emailError.textContent = "Please enter a valid Gmail address";
+            return;
+        } else {
+            emailError.textContent = "";
+        }
+
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&^()_\-+=])[A-Za-z\d@$!%*#?&^()_\-+=]{6,}$/;
+        if (!passwordRegex.test(password)) {
+            passwordError.textContent = "Password should have atleast one letter , number , unique character";
+            return;
+        } else {
+            passwordError.textContent = "";
+        }
+
+        const phoneNumberRegex = "";
+        if (!phoneNumberRegex.test()) {
+            phoneNumberError.textContent = "";
+            return;
+        } else {
+            phoneNumberError.textContent = "";
+        }
+
+        submitData({ name, email, phoneNumber, password });
+
+    }
+
+    async function submitData(data) {
+        const { name, email, phoneNumber, password } = data;
+        console.log(name, email, password);
+
+        fetch("http://localhost:8080/securebank/signup", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(data => data.json())
+            .then((data) => console.log(data))
+            .catch(e => console.error('Error posting data:', error));
+    }
+</script>
 
 </html>
