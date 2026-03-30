@@ -22,12 +22,6 @@ public class BankService{
 
     private static final Logger logger = LoggerFactory.getLogger(BankService.class);
 
-    public BankService(UserDAO userDao,AccountDAO accountDao,TransactionDAO transactionDao){
-        this.userDao = userDao;
-        this.accountDao = accountDao;
-        this.transactionDao = transactionDao;
-    }
-
     private String getAccountNumberFromUser(Scanner sc,String txt){
         String accountNumber = null;
         while(true){
@@ -249,6 +243,8 @@ public class BankService{
             
         BigDecimal amount = getAmountFromUser(sc,"Enter Amount to Transfer: ");
 
+        AccountDAO accountDao = new AccountDAO();
+
         BigDecimal senderAvailableBalance = accountDao.getBalance(senderAccountNumber);
         if (amount.compareTo(senderAvailableBalance) > 0) {
             logger.warn("Transfer failed: Available balance is less than withdraw balance");
@@ -321,6 +317,8 @@ public class BankService{
         String accountNumber = getAccountNumberFromUser(sc,"Enter Account Number: ");
         if(accountNumber == null) return;
 
+        AccountDAO accountDao = new AccountDAO();
+
         Account a = accountDao.checkBalance(accountNumber);
 
         System.out.println("-----------------------------------------");
@@ -334,6 +332,8 @@ public class BankService{
     public void viewTransactionHistory(Scanner sc) {
         String accountNumber = getAccountNumberFromUser(sc,"Enter Account Number: ");
         if(accountNumber == null) return;
+
+        TransactionDAO transactionDao = new TransactionDAO();
 
         ArrayList<Transaction> transactionHistory =
                 transactionDao.getAllTransactions(accountNumber);
