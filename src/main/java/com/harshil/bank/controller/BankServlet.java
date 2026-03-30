@@ -22,7 +22,6 @@ public class BankServlet extends HttpServlet {
         }
 
         switch (path) {
-
             case "/dashboard":
             case "/dashboard/":
                 req.getRequestDispatcher("/dashboard.html").forward(req, res);
