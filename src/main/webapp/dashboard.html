@@ -29,19 +29,19 @@
         <!-- Header -->
         <div class="header">
             <h1>Dashboard</h1>
-            <div class="user">Welcome, User</div>
+            <div class="user">Welcome, <span id="userName">User</span></div>
         </div>
 
         <!-- Cards -->
         <div class="cards">
             <div class="card">
                 <h3>Total Balance</h3>
-                <p>₹ 0.00</p>
+                <p>₹ <span id="balance">0.00</span></p>
             </div>
 
             <div class="card">
                 <h3>Last Transaction</h3>
-                <p>₹ 0.00</p>
+                <p>₹ <span id="lastTransactionAmount">0.00</span></p>
             </div>
 
             <div class="card">
@@ -64,5 +64,22 @@
     </div>
 
 </body>
+
+<script>
+    window.addEventListener("DOMContentLoaded", () => {
+        fetch("http://localhost:8080/securebank/bank/dashboard/api/")
+            .then(data => data.json())
+            .then(data => fillData(data))
+            .catch(e => console.error("Error fetching data: ", e));
+
+        function fillData(data) {
+            const { name, balance, lastTransactionAmount } = data;
+            document.querySelector("#userName").textContent = name;
+            document.querySelector("#balance").textContent = balance;
+            document.querySelector("#lastTransactionAmount").textContent = lastTransactionAmount;
+
+        }
+    });
+</script>
 
 </html>

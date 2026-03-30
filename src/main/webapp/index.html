@@ -85,6 +85,11 @@
         a:hover {
             text-decoration: underline;
         }
+
+        .error {
+            text-align: left;
+            color: rgb(232, 28, 28);
+        }
     </style>
 </head>
 
@@ -93,12 +98,17 @@
     <div class="container">
         <h2>Login</h2>
 
-        <form>
-            <label>Email</label>
-            <input type="text" name="email" placeholder="Enter your email">
+        <form onsubmit="handleSubmit(event)">
+            <label for="email">
+                Email : <input type="email" name="email" id="email" placeholder="Enter your email" required>
+            </label>
+            <p class="error" id="emailError"></p>
 
-            <label>Password</label>
-            <input type="password" name="password" placeholder="Enter your password">
+            <label for="password">
+                Password : <input type="password" id="password" name="password" placeholder="Enter your password"
+                    required minlength="6" maxlength="8">
+            </label>
+            <p class="error" id="passwordError"></p>
 
             <button type="submit">Login</button>
         </form>
@@ -107,5 +117,52 @@
     </div>
 
 </body>
+
+<script>
+    function handleSubmit(e) {
+        e.preventDefault();
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        const emailError = document.getElementById("emailError");
+        const passwordError = document.getElementById("passwordError");
+
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        if (!emailRegex.test(email)) {
+            emailError.textContent = "Please enter a valid Gmail address";
+            return;
+        } else {
+            emailError.textContent = "";
+        }
+
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&^()_\-+=])[A-Za-z\d@$!%*#?&^()_\-+=]{6,}$/;
+        if (!passwordRegex.test(password)) {
+            passwordError.textContent = "Password should have atleast one letter , number , unique character";
+            return;
+        } else {
+            passwordError.textContent = "";
+        }
+
+        submitData({ email, password });
+
+    }
+
+    async function submitData(data) {
+        const { email, password } = data;
+        console.log(email, password);
+
+        fetch("http://localhost:8080/securebank/home", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(data => data.json())
+            .then(data => console.log(data.message))
+            .catch(e => console.error('Error posting data:', e));
+    }
+</script>
 
 </html>

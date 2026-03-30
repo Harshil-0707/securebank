@@ -181,8 +181,8 @@
             body: JSON.stringify(data)
         })
             .then(data => data.json())
-            .then((data) => console.log(data))
-            .catch(e => console.error('Error posting data:', error));
+            .then((data) => console.log(data.message))
+            .catch(e => console.error('Error posting data:', e));
     }
 </script>
 
