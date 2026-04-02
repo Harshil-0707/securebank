@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Bank - Create Account</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 350px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #2563eb;
+        }
+
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        p {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .error {
+            text-align: left;
+            color: rgb(232, 28, 28);
+        }
+
+        .success {
+            text-align: center;
+            color: green;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Create Account</h2>
+
+        <form onsubmit="handleSubmit(event)">
+            <label>
+                Account Type :
+                <select id="accountType" required>
+                    <option value="">Select Account Type</option>
+                    <option value="SAVINGS">Savings</option>
+                    <option value="CURRENT">Current</option>
+                </select>
+            </label>
+            <p class="error" id="typeError"></p>
+
+            <label>
+                Initial Deposit :
+                <input type="number" id="balance" placeholder="Enter amount" required min="0">
+            </label>
+            <p class="error" id="balanceError"></p>
+
+            <button type="submit">Create Account</button>
+        </form>
+
+        <p class="success" id="successMsg"></p>
+    </div>
+
+</body>
+
+<script>
+    function handleSubmit(e) {
+        e.preventDefault();
+
+        const accountType = document.getElementById("accountType");
+        const balance = document.getElementById("balance");
+
+        const typeError = document.getElementById("typeError");
+        const balanceError = document.getElementById("balanceError");
+        const successMsg = document.getElementById("successMsg");
+
+        // validation
+        if (!accountType.value) {
+            typeError.textContent = "Please select account type";
+            return;
+        } else {
+            typeError.textContent = "";
+        }
+
+        if (balance.value <= 0) {
+            balanceError.textContent = "Enter valid amount";
+            return;
+        } else {
+            balanceError.textContent = "";
+        }
+
+        submitData();
+
+        async function submitData() {
+            fetch("http://localhost:8080/securebank/create-account", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    accountType: accountType.value,
+                    balance: parseFloat(balance.value)
+                })
+            })
+                .then(data => data.json())
+                .then(data => {
+                    if (data.message === "Success") {
+                        successMsg.textContent = "Account created successfully!";
+
+                        setTimeout(() => {
+                            window.location.href = "http://localhost:8080/securebank/bank/dashboard";
+                        }, 1000);
+                    }
+                })
+                .catch(e => console.error('Error:', e));
+        }
+    }
+</script>
+
+</html>
