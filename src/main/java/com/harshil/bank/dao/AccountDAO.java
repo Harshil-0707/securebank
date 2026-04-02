@@ -22,12 +22,8 @@ public class AccountDAO{
         this.con = con;
     }
 
-    public Connection getConnection(){
-        return this.con;
-    }
-
     public boolean createAccount(Account account){
-        String sql = "INSERT INTO accounts (user_id,account_number,account_type) VALUES (?,?,?)";
+        String sql = "INSERT INTO accounts (user_id,account_number,account_type,balance) VALUES (?,?,?,?)";
 
         int rowsAffected = 0;
 
@@ -35,11 +31,10 @@ public class AccountDAO{
             ps.setInt(1,account.getUserId());
             ps.setString(2,account.getAccountNumber());
             ps.setString(3,account.getAccountType());
+            ps.setBigDecimal(4,account.getBalance());
             rowsAffected = ps.executeUpdate();
-            System.out.println(account.getAccountNumber());
         }catch(Exception e){
             AccountDAO.logger.error("Account creation Error: ",e);
-            e.printStackTrace();
         }
         return rowsAffected > 0;
     }
@@ -106,9 +101,8 @@ public class AccountDAO{
                     int userId = rs.getInt("user_id");
                     String accountType = rs.getString("account_type");
                     BigDecimal balance = rs.getBigDecimal("balance");
-                    a = new Account(userId,accountType);
+                    a = new Account(userId,accountType,balance);
                     a.setAccountNumber(accountNumber);
-                    a.setBalance(balance);
                 }
             }catch(Exception e){
                 AccountDAO.logger.error("Error setting account details for account number={}",accountNumber,e);
