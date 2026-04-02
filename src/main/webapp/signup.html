@@ -110,7 +110,7 @@
 
             <label for="phoneNumber">
                 Phone Number : <input type="text" name="phoneNumber" id="phoneNumber"
-                    placeholder="Enter your phone number" required>
+                    placeholder="Enter your phone number" required minlength="10" maxlength="10">
             </label>
             <p class="error" id="phoneNumberError"></p>
 
@@ -132,17 +132,17 @@
     function handleSubmit(e) {
         e.preventDefault();
 
-        const name = document.getElementById("name").value;
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
-        const phoneNumber = docuemnt.getElementById("phoneNumber").value;
+        const name = document.getElementById("name");
+        const email = document.getElementById("email");
+        const password = document.getElementById("password");
+        const phoneNumber = document.getElementById("phoneNumber");
 
         const emailError = document.getElementById("emailError");
         const passwordError = document.getElementById("passwordError");
         const phoneNumberError = document.getElementById("phoneNumberError");
 
         const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-        if (!emailRegex.test(email)) {
+        if (!emailRegex.test(email.value)) {
             emailError.textContent = "Please enter a valid Gmail address";
             return;
         } else {
@@ -150,40 +150,53 @@
         }
 
         const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&^()_\-+=])[A-Za-z\d@$!%*#?&^()_\-+=]{6,}$/;
-        if (!passwordRegex.test(password)) {
+        if (!passwordRegex.test(password.value)) {
             passwordError.textContent = "Password should have atleast one letter , number , unique character";
             return;
         } else {
             passwordError.textContent = "";
         }
 
-        const phoneNumberRegex = "";
-        if (!phoneNumberRegex.test()) {
-            phoneNumberError.textContent = "";
+        const phoneNumberRegex = /^(\+91[\-\s]?)?[6-9]\d{9}$/;
+        if (!phoneNumberRegex.test(phoneNumber.value)) {
+            phoneNumberError.textContent = "Invalid number";
             return;
         } else {
             phoneNumberError.textContent = "";
         }
 
-        submitData({ name, email, phoneNumber, password });
+        submitData();
+
+        async function submitData() {
+
+            fetch("http://localhost:8080/securebank/signup", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(
+                    {
+                        name: name.value,
+                        email: email.value,
+                        phoneNumber: phoneNumber.value,
+                        password: password.value
+                    })
+            })
+                .then(data => data.json())
+                .then((data) => {
+                    if (data.message === "Success") {
+                        name.value = "";
+                        email.value = "";
+                        phoneNumber.value = "";
+                        password.value = "";
+                        window.location.href = "http://localhost:8080/securebank/create-account";
+                    }
+                })
+                .catch(e => console.error('Error posting data:', e));
+        }
 
     }
 
-    async function submitData(data) {
-        const { name, email, phoneNumber, password } = data;
-        console.log(name, email, password);
-
-        fetch("http://localhost:8080/securebank/signup", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-            .then(data => data.json())
-            .then((data) => console.log(data.message))
-            .catch(e => console.error('Error posting data:', e));
-    }
 </script>
 
 </html>
