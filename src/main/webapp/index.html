@@ -122,14 +122,14 @@
     function handleSubmit(e) {
         e.preventDefault();
 
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+        const email = document.getElementById("email");
+        const password = document.getElementById("password");
 
         const emailError = document.getElementById("emailError");
         const passwordError = document.getElementById("passwordError");
 
         const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-        if (!emailRegex.test(email)) {
+        if (!emailRegex.test(email.value)) {
             emailError.textContent = "Please enter a valid Gmail address";
             return;
         } else {
@@ -137,31 +137,35 @@
         }
 
         const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&^()_\-+=])[A-Za-z\d@$!%*#?&^()_\-+=]{6,}$/;
-        if (!passwordRegex.test(password)) {
+        if (!passwordRegex.test(password.value)) {
             passwordError.textContent = "Password should have atleast one letter , number , unique character";
             return;
         } else {
             passwordError.textContent = "";
         }
 
-        submitData({ email, password });
+        submitData();
 
-    }
+        async function submitData() {
 
-    async function submitData(data) {
-        const { email, password } = data;
-        console.log(email, password);
+            fetch("http://localhost:8080/securebank/home", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: email.value, password: password.value })
+            })
+                .then(data => data.json())
+                .then(data => {
+                    if (data.message === "Success") {
+                        email.value = "";
+                        password.value = "";
+                        window.location.href = "http://localhost:8080/securebank/bank/dashboard";
+                    }
+                })
+                .catch(e => console.error('Error posting data:', e));
+        }
 
-        fetch("http://localhost:8080/securebank/home", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-            .then(data => data.json())
-            .then(data => console.log(data.message))
-            .catch(e => console.error('Error posting data:', e));
     }
 </script>
 
