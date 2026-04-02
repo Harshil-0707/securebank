@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 
 public class DashboardData{
 
-
     private String name;
     private BigDecimal balance;
     private BigDecimal lastTransactionAmount;
