@@ -22,13 +22,14 @@ public class UserDAO{
     }
 
     public boolean createUser(User user){
-        String sql = "INSERT INTO users (name,email,phone) VALUES (?,?,?)";
+        String sql = "INSERT INTO users (name,email,phone,password) VALUES (?,?,?,?)";
         int rowsAffected = 0;
 
         try(PreparedStatement ps = con.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)){
             ps.setString(1,user.getName());
             ps.setString(2,user.getEmail());
             ps.setString(3,user.getPhoneNumber());
+            ps.setString(4,user.getPassword());
             rowsAffected = ps.executeUpdate();
 
             try(ResultSet rs = ps.getGeneratedKeys()){
@@ -42,6 +43,20 @@ public class UserDAO{
             e.printStackTrace();
         }
         return rowsAffected > 0;
+    }
+
+    public boolean userExists(String email,String password){
+        String sql = "SELECT 1 FROM users WHERE email = ? AND password = ?";
+        try(PreparedStatement ps = con.prepareStatement(sql)){
+            ps.setString(1,email);
+            ps.setString(2,password);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        }catch(Exception e){
+            UserDAO.logger.error("Error logging in user",e);
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public boolean validateUserID(int id){
