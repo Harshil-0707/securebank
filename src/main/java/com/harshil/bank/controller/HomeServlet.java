@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.*;
 import java.io.*;
 
 import com.harshil.bank.dto.LoginData;
+import com.harshil.bank.service.BankService;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -37,13 +38,20 @@ public class HomeServlet extends HttpServlet {
 
         String json = sb.toString();
 
-        LoginData data = HomeServlet.mapper.readValue(json,LoginData.class);
+        LoginData ld = HomeServlet.mapper.readValue(json,LoginData.class);
+
+        BankService bs = new BankService();
 
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
 
         PrintWriter out = res.getWriter();
-        out.print("{\"message\":\"Success\"}");
+
+        if(bs.UserExists(ld)){
+            out.print("{\"message\":\"Success\"}");
+        }else{
+            out.print("{\"message\":\"Failed\"}");
+        }
         out.flush();
 
     }
