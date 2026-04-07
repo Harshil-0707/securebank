@@ -6,7 +6,10 @@ import jakarta.servlet.annotation.*;
 import java.io.*;
 
 import com.harshil.bank.dto.SignUpData;
+
 import com.harshil.bank.service.BankService;
+
+import com.harshil.bank.model.User;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -45,9 +48,15 @@ public class SignupServlet extends HttpServlet{
 
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
+
         PrintWriter out = res.getWriter();
         
-        if(bs.createUser(sd)){
+        User user = bs.createUser(sd);
+
+        if(user != null){
+            HttpSession session = req.getSession();
+            session.setAttribute("userId", user.getId());
+
             out.print("{\"message\":\"Success\"}");
         }else{
             out.print("{\"message\":\"Failed\"}");
