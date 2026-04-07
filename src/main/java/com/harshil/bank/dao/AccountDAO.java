@@ -35,6 +35,7 @@ public class AccountDAO{
             rowsAffected = ps.executeUpdate();
         }catch(Exception e){
             AccountDAO.logger.error("Account creation Error: ",e);
+            e.printStackTrace();
         }
         return rowsAffected > 0;
     }
@@ -47,7 +48,6 @@ public class AccountDAO{
             return rs.next();
         }catch(Exception e){
             AccountDAO.logger.error("Error in finding record using field name={} and value={}",fieldName,value,e);
-            e.printStackTrace();
         }
         return false;
     }
@@ -69,9 +69,38 @@ public class AccountDAO{
             rowsAffected = ps.executeUpdate();
         }catch(Exception e){
             AccountDAO.logger.error("Error updating balance: ",e);
-            e.printStackTrace();
         }
         return rowsAffected > 0;
+    }
+
+    public Account getAccountData(int id){
+        String sql = "SELECT * FROM accounts WHERE user_id = ? ";
+
+        Account account = null;
+
+        try(PreparedStatement ps = con.prepareStatement(sql)){
+
+            ps.setInt(1,id);
+
+            try(ResultSet rs = ps.executeQuery()){
+                if(rs.next()){
+                    account = new Account();
+                    account.setUserId(id);
+                    account.setAccountId(rs.getInt("account_id"));
+                    account.setAccountNumber(rs.getString("account_number"));
+                    account.setBalance(rs.getBigDecimal("balance"));
+                    account.setAccountType(rs.getString("account_type"));
+                    return account;
+                }
+            }catch(Exception e){
+                AccountDAO.logger.error("Account creation Error: ",e);
+            }
+
+        }catch(Exception e){
+            AccountDAO.logger.error("Error getting data for user id = {}",id,e);
+        }
+
+        return null;
     }
  
     public BigDecimal getBalance(String accountNumber){
