@@ -23,19 +23,25 @@ public class BankService{
 
     public BankService(){}
 
-    public boolean createUser(SignUpData sd){
+    public User createUser(SignUpData sd){
       
         try(Connection connection = DBConnection.getConnection()){
 
             UserDAO userDao = new UserDAO(connection);
 
-            if(userDao.createUser(new User(sd.getName(),sd.getEmail(),sd.getPhoneNumber(),sd.getPassword()))){
-                return true;
-            }
+            return userDao.createUser(
+                new User(
+                    sd.getName(),
+                    sd.getEmail(),
+                    sd.getPhoneNumber(),
+                    sd.getPassword()
+                )
+            );
+
         }catch(Exception e){
             e.printStackTrace();
         }
-        return false;
+        return null;
     }
 
     public boolean UserExists(LoginData ld){
@@ -50,26 +56,52 @@ public class BankService{
         return false;
     }
 
-    public boolean createAccount(CreateAccountData cad){
+    public Account createAccount(CreateAccountData cad){
 
         try(Connection con = DBConnection.getConnection()){
             UserDAO userDao = new UserDAO(con);
         
-            if(!userDao.validateUserID(cad.getUserId())) return false;
+            if(!userDao.validateUserID(cad.getUserId())) return null;
             
             Account account = new Account(cad.getUserId(),cad.getAccountType(),cad.getBalance());
 
             AccountDAO accountDao = new AccountDAO(con);
             
-            if(!accountDao.createAccount(account)){
-                return false;
-            }
+            if(accountDao.createAccount(account)) return account;
+            
         }catch(Exception e){
             e.printStackTrace();
-            return false;
         }
-        return true;
+        return null;
 
+    }
+
+    public DashboardData getDashboardData(int userId,String accountNumber){
+        
+        String name = null;
+        BigDecimal balance = new BigDecimal("0.00");
+        BigDecimal lastTransactionAmount = new BigDecimal("0.00");
+        
+        try(Connection connection = DBConnection.getConnection()){
+            
+            UserDAO userDao = new UserDAO(connection);
+            User user = userDao.getUserData(userId);
+            name = user.getName();
+
+            AccountDAO accountDao = new AccountDAO(connection);
+            Account account = accountDao.getAccountData(userId);
+            balance = account.getBalance();
+
+            TransactionDAO transactionDao = new TransactionDAO(connection);
+            Transaction transaction = transactionDao.getLatestTransaction(accountNumber);
+            if(transaction != null){
+                lastTransactionAmount = transaction.getTransactionAmount();
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return new DashboardData(name,balance,lastTransactionAmount);
     }
 
     // public void deposit(){
