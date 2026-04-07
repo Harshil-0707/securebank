@@ -21,7 +21,7 @@ public class UserDAO{
         this.con = con;
     }
 
-    public boolean createUser(User user){
+    public User createUser(User user){
         String sql = "INSERT INTO users (name,email,phone,password) VALUES (?,?,?,?)";
         int rowsAffected = 0;
 
@@ -32,17 +32,19 @@ public class UserDAO{
             ps.setString(4,user.getPassword());
             rowsAffected = ps.executeUpdate();
 
-            try(ResultSet rs = ps.getGeneratedKeys()){
-                if(rs.next()) System.out.println("User ID: " + rs.getInt(1));
+            try(ResultSet rs = ps.getGeneratedKeys()){  
+                if(rs.next()){
+                    User u = new User();
+                    u.setId(rs.getInt(1));
+                    return u;    
+                }
             }catch(Exception e){
-                UserDAO.logger.error("Error getting user id: ",e);
-                e.printStackTrace();
+                UserDAO.logger.error("Error getting user id: " , e);
             }
         }catch(Exception e){
-            UserDAO.logger.error("Error inserting user into database: ",e);
-            e.printStackTrace();
+            UserDAO.logger.error("Error inserting user into database: " , e);
         }
-        return rowsAffected > 0;
+        return null;
     }
 
     public boolean userExists(String email,String password){
@@ -59,6 +61,26 @@ public class UserDAO{
         return false;
     }
 
+    public User getUserData(int id){
+        String sql = "SELECT * FROM users WHERE user_id = ?";
+        try(PreparedStatement ps = con.prepareStatement(sql)){
+            ps.setInt(1,id);
+            try(ResultSet rs = ps.executeQuery()){
+                if(rs.next()){
+                    return new User(
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getString("phone"),
+                        rs.getString("password")
+                    );
+                }
+            }
+        }catch(Exception e){
+            UserDAO.logger.error("Error getting user by id = {} ",id,e);
+        }
+        return null;
+    }
+
     public boolean validateUserID(int id){
         String sql = "SELECT * FROM users WHERE user_id = ?";
         try(PreparedStatement ps = con.prepareStatement(sql)){
@@ -67,7 +89,6 @@ public class UserDAO{
             return rs.next();
         }catch(Exception e){
             UserDAO.logger.error("Error getting user id ={} ",id,e);
-            e.printStackTrace();
         }
         return false;
     }
