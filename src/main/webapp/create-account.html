@@ -63,11 +63,6 @@
             margin: 0;
         }
 
-        /* Firefox */
-        input[type=number] {
-            -moz-appearance: textfield;
-        }
-
         button {
             width: 100%;
             padding: 10px;
@@ -128,7 +123,6 @@
             <button type="submit">Create Account</button>
         </form>
 
-        <p class="success" id="successMsg"></p>
     </div>
 
 </body>
@@ -175,11 +169,12 @@
                 .then(data => data.json())
                 .then(data => {
                     if (data.message === "Success") {
-                        successMsg.textContent = "Account created successfully!";
 
                         setTimeout(() => {
                             window.location.href = "http://localhost:8080/securebank/bank/dashboard";
-                        }, 1000);
+                        }, 100);
+                    } else {
+                        console.log(data.message);
                     }
                 })
                 .catch(e => console.error('Error:', e));
