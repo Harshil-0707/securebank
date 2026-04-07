@@ -15,9 +15,15 @@ public class BankServlet extends HttpServlet {
         String path = req.getPathInfo();
 
         res.setContentType("text/html");
-
+        
         if (path == null) {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path missing");
+            return;
+        }
+
+        HttpSession session = req.getSession(false);
+        if(session == null && session.getAttribute("userId") == null){
+            res.getWriter().write("{\"message\":\"Failed\"}");
             return;
         }
 
