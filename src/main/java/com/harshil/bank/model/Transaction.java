@@ -11,6 +11,7 @@ public class Transaction{
     private BigDecimal transactionAmount;
     private LocalDateTime transactionTime;
 
+    public Transaction(){}
 
     public Transaction(String accountNumber,String transactionType,BigDecimal transactionAmount){
         this.accountNumber = accountNumber;
