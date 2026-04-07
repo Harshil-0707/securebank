@@ -48,6 +48,34 @@ public class TransactionDAO{
         return rowsAffected > 0;
     }
 
+    public Transaction getLatestTransaction(String accountNumber){
+        String sql = "SELECT * FROM transactions WHERE account_number = ? ORDER BY transaction_date DESC LIMIT 1";
+
+        Transaction transaction = null;
+
+        try(PreparedStatement ps = con.prepareStatement(sql)){
+           
+            ps.setString(1,accountNumber);
+            
+            try(ResultSet rs = ps.executeQuery()){
+                if(rs.next()){
+                    int id = rs.getInt("transaction_id");
+                    String type = rs.getString("type");
+                    BigDecimal amount = rs.getBigDecimal("amount");
+                    LocalDateTime date = rs.getTimestamp("transaction_date").toLocalDateTime();
+                    transaction = new Transaction(accountNumber,type,amount);
+                    transaction.setTransactionTime(date);
+                    transaction.setTransactionId(id);
+                }
+            }catch(Exception e){
+                TransactionDAO.logger.error("Error setting transaction details for account number = {}",accountNumber,e);
+            }
+        }catch(Exception e){
+            TransactionDAO.logger.error("Error getting transaction details for the account number = {}",accountNumber,e);
+        }
+        return transaction;
+    }
+
     public ArrayList<Transaction> getAllTransactions(String accountNumber){
         String sql = "SELECT * FROM transactions WHERE account_number = ? ORDER BY transaction_date DESC";
 
@@ -68,11 +96,9 @@ public class TransactionDAO{
                 }
             }catch(Exception e){
                 TransactionDAO.logger.error("Error setting transaction details for account number = {}",accountNumber,e);
-                e.printStackTrace();
             }
         }catch(Exception e){
             TransactionDAO.logger.error("Error getting transaction details for the account number = {}",accountNumber,e);
-            e.printStackTrace();
         }
         return transactions;
     }
