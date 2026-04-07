@@ -185,11 +185,9 @@
                 .then(data => data.json())
                 .then((data) => {
                     if (data.message === "Success") {
-                        name.value = "";
-                        email.value = "";
-                        phoneNumber.value = "";
-                        password.value = "";
-                        window.location.href = "http://localhost:8080/securebank/create-account";
+                        setTimeout(() => {
+                            window.location.href = "http://localhost:8080/securebank/create-account";
+                        }, 100);
                     }
                 })
                 .catch(e => console.error('Error posting data:', e));
