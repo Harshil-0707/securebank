@@ -10,6 +10,8 @@ public class Account{
     private BigDecimal balance;
     private String accountType;
 
+    public Account(){}
+
     public Account(int userId,String accountType,BigDecimal balance){
         this.accountNumber = UUID.randomUUID().toString().substring(0,6);
         this.userId = userId;
