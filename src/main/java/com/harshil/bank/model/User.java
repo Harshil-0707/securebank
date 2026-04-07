@@ -11,6 +11,8 @@ public class User{
     private String phoneNumber;
     private LocalDateTime createdAt;
 
+    public User(){}
+
     public User(String name,String email,String phoneNumber,String password){
         this.name = name;
         this.email = email;
