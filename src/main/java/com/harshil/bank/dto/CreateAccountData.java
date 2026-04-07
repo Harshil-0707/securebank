@@ -8,6 +8,8 @@ public class CreateAccountData{
     private String accountType;
     private int userId;
 
+    public CreateAccountData(){}
+
     public CreateAccountData(int userId,String accountType,BigDecimal balance){
         this.userId = userId;
         this.accountType = accountType;
