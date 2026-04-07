@@ -9,6 +9,8 @@ import com.harshil.bank.dto.CreateAccountData;
 
 import com.harshil.bank.service.BankService;
 
+import com.harshil.bank.model.Account;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebServlet("/create-account")
@@ -41,6 +43,18 @@ public class CreateAccountServlet extends HttpServlet{
 
         CreateAccountData cad = CreateAccountServlet.mapper.readValue(json,CreateAccountData.class);
 
+        HttpSession session = req.getSession(false);
+        Integer userIdObj = (Integer) session.getAttribute("userId");
+
+        if(session == null && userIdObj == null){
+            res.getWriter().write("{\"message\":\"Failed\"}");
+            return;
+        }
+
+        int userId = userIdObj;
+
+        cad.setUserId(userId);
+
         BankService bs = new BankService();
 
         res.setContentType("application/json");
@@ -48,7 +62,11 @@ public class CreateAccountServlet extends HttpServlet{
 
         PrintWriter out = res.getWriter();
 
-        if(bs.createAccount(cad)){
+        Account account = bs.createAccount(cad);
+
+        if(account != null){
+            session.setAttribute("accountNumber", account.getAccountNumber());
+
             out.print("{\"message\":\"Success\"}");
         }else{
             out.print("{\"message\":\"Failed\"}");
