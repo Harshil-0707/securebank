@@ -11,6 +11,8 @@ import com.harshil.bank.dto.DashboardData;
 
 import com.harshil.bank.dao.*;
 
+import com.harshil.bank.service.BankService;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebServlet("/bank/dashboard/api/")
@@ -22,10 +24,30 @@ public class DashboardServlet extends HttpServlet{
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
+        HttpSession session = req.getSession(false);
+
+        Integer userIdObj = (Integer) session.getAttribute("userId");
+        String accountNumber = (String) session.getAttribute("accountNumber");
+
+        if(session == null && userIdObj == null){
+            res.getWriter().write("{\"message\":\"Failed\"}");
+            return;
+        }
+
+        if(accountNumber == null){
+            res.getWriter().write("{\"message\":\"Account Number not found\"}");
+            return;
+        }
+
+        int userId = userIdObj;
+
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
 
-        DashboardData dashboardData = new DashboardData("Harshil",new BigDecimal(2000),new BigDecimal(2000.12));
+        BankService bs = new BankService();
+
+        DashboardData dashboardData = bs.getDashboardData(userId,accountNumber);
+        
         res.getWriter().print(DashboardServlet.mapper.writeValueAsString(dashboardData));
 
     }
