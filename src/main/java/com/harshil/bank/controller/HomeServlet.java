@@ -8,6 +8,9 @@ import java.io.*;
 import com.harshil.bank.dto.LoginData;
 import com.harshil.bank.service.BankService;
 
+import com.harshil.bank.model.User;
+import com.harshil.bank.model.Account;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebServlet("/home")
@@ -46,9 +49,19 @@ public class HomeServlet extends HttpServlet {
         res.setCharacterEncoding("UTF-8");
 
         PrintWriter out = res.getWriter();
+        User user = bs.UserExists(ld);
 
-        if(bs.UserExists(ld)){
-            out.print("{\"message\":\"Success\"}");
+        if(user != null){
+            Account account = bs.getAccountData(user.getId());
+            if(account != null){
+                HttpSession session = req.getSession();
+                session.setAttribute("userId", user.getId());
+                session.setAttribute("accountNumber",account.getAccountNumber());
+
+                out.print("{\"message\":\"Success\"}");
+            }else{
+                out.print("{\"message\":\"Failed\"}");
+            }
         }else{
             out.print("{\"message\":\"Failed\"}");
         }
