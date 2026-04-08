@@ -44,16 +44,13 @@ public class BankService{
         return null;
     }
 
-    public boolean UserExists(LoginData ld){
+    public User UserExists(LoginData ld){
         try(Connection connection = DBConnection.getConnection()){
-            UserDAO userDao = new UserDAO(connection);
-            if(userDao.userExists(ld.getEmail(),ld.getPassword())){
-                return true;
-            }
+            return new UserDAO(connection).userExists(ld.getEmail(),ld.getPassword());
         }catch(Exception e){
             e.printStackTrace();
         }
-        return false;
+        return null;
     }
 
     public Account createAccount(CreateAccountData cad){
@@ -102,6 +99,15 @@ public class BankService{
             e.printStackTrace();
         }
         return new DashboardData(name,balance,lastTransactionAmount);
+    }
+
+    public Account getAccountData(int userId){
+        try(Connection connection = DBConnection.getConnection()){
+            return new AccountDAO(connection).getAccountData(userId);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     // public void deposit(){
