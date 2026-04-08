@@ -19,7 +19,7 @@
         <a href="/securebank/bank/dashboard/view-balance">View Balance</a>
         <a href="/securebank/bank/dashboard/transfer">Transfer Money</a>
         <a href="/securebank/bank/dashboard/transactions">Transactions</a>
-        <a href="/securebank/">Logout</a>
+        <button onclick="logout()" id="logoutBtn">Logout</button>
 
     </div>
 
@@ -80,6 +80,20 @@
 
         }
     });
+    async function logout() {
+        fetch("http://localhost:8080/securebank/logout")
+            .then(data => data.json())
+            .then(data => {
+                if (data.message === "Success") {
+                    setTimeout(() => {
+                        window.location.href = "http://localhost:8080/securebank/";
+                    }, 100);
+                } else {
+                    console.log(data.message);
+                }
+            })
+            .catch(e => console.error("Error logging out: ", e));
+    }
 </script>
 
 </html>
