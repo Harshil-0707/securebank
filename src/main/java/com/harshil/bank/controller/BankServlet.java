@@ -22,8 +22,9 @@ public class BankServlet extends HttpServlet {
         }
 
         HttpSession session = req.getSession(false);
-        if(session == null && session.getAttribute("userId") == null){
-            res.getWriter().write("{\"message\":\"Failed\"}");
+       
+        if(session == null || session.getAttribute("userId") == null || session.getAttribute("accountNumber") == null){
+            res.sendRedirect(req.getContextPath() + "/index.html");
             return;
         }
 
