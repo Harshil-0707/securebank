@@ -46,7 +46,7 @@ public class CreateAccountServlet extends HttpServlet{
         HttpSession session = req.getSession(false);
         Integer userIdObj = (Integer) session.getAttribute("userId");
 
-        if(session == null && userIdObj == null){
+        if(session == null || userIdObj == null){
             res.getWriter().write("{\"message\":\"Failed\"}");
             return;
         }
