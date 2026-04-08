@@ -47,18 +47,32 @@ public class UserDAO{
         return null;
     }
 
-    public boolean userExists(String email,String password){
-        String sql = "SELECT 1 FROM users WHERE email = ? AND password = ?";
+    public User userExists(String email,String password){
+        String sql = "SELECT * FROM users WHERE email = ? AND password = ?";
+
         try(PreparedStatement ps = con.prepareStatement(sql)){
             ps.setString(1,email);
             ps.setString(2,password);
-            ResultSet rs = ps.executeQuery();
-            return rs.next();
+            
+            try(ResultSet rs = ps.executeQuery()){
+                if(rs.next()){
+
+                    int id = rs.getInt("user_id");
+
+                    User user = new User();
+                    user.setId(id);
+
+                    return user;
+                }
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
         }catch(Exception e){
             UserDAO.logger.error("Error logging in user",e);
             e.printStackTrace();
         }
-        return false;
+        return null;
     }
 
     public User getUserData(int id){
