@@ -110,6 +110,8 @@
             </label>
             <p class="error" id="passwordError"></p>
 
+            <p id="submitError" class="error"></p>
+
             <button type="submit">Login</button>
         </form>
 
@@ -127,6 +129,7 @@
 
         const emailError = document.getElementById("emailError");
         const passwordError = document.getElementById("passwordError");
+        const submitError = document.getElementById("submitError");
 
         const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
         if (!emailRegex.test(email.value)) {
@@ -158,9 +161,13 @@
                 .then(data => data.json())
                 .then(data => {
                     if (data.message === "Success") {
+                        submitError.textContent = "";
+
                         setTimeout(() => {
                             window.location.href = "http://localhost:8080/securebank/bank/dashboard";
                         }, 100);
+                    } else {
+                        submitError.textContent = "Invalid email or password";
                     }
                 })
                 .catch(e => console.error('Error posting data:', e));
