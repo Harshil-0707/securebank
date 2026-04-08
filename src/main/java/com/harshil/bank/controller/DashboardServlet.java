@@ -29,20 +29,15 @@ public class DashboardServlet extends HttpServlet{
         Integer userIdObj = (Integer) session.getAttribute("userId");
         String accountNumber = (String) session.getAttribute("accountNumber");
 
-        if(session == null && userIdObj == null){
+        res.setContentType("application/json");
+        res.setCharacterEncoding("UTF-8");
+
+        if(session == null || userIdObj == null || accountNumber == null){
             res.getWriter().write("{\"message\":\"Failed\"}");
             return;
         }
 
-        if(accountNumber == null){
-            res.getWriter().write("{\"message\":\"Account Number not found\"}");
-            return;
-        }
-
         int userId = userIdObj;
-
-        res.setContentType("application/json");
-        res.setCharacterEncoding("UTF-8");
 
         BankService bs = new BankService();
 
