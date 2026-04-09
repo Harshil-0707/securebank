@@ -120,6 +120,8 @@
             </label>
             <p class="error" id="passwordError"></p>
 
+            <p class="error" id="deplicateError"></p>
+
             <button type="submit">Sign Up</button>
         </form>
 
@@ -139,6 +141,7 @@
 
         const emailError = document.getElementById("emailError");
         const passwordError = document.getElementById("passwordError");
+        const deplicateError = document.getElementById("deplicateError");
         const phoneNumberError = document.getElementById("phoneNumberError");
 
         const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
@@ -176,7 +179,7 @@
                 },
                 body: JSON.stringify(
                     {
-                        name: name.value,
+                        name: name.value.toLowerCase(),
                         email: email.value,
                         phoneNumber: phoneNumber.value,
                         password: password.value
@@ -188,6 +191,8 @@
                         setTimeout(() => {
                             window.location.href = "http://localhost:8080/securebank/create-account";
                         }, 100);
+                    } else {
+                        deplicateError.textContent = data.message;
                     }
                 })
                 .catch(e => console.error('Error posting data:', e));
