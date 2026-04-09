@@ -22,6 +22,13 @@ public class CreateAccountServlet extends HttpServlet{
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
 
+         HttpSession session = req.getSession(false);
+       
+        if(session == null || session.getAttribute("userId") == null){
+            res.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
         res.setContentType("text/html");
         req.getRequestDispatcher("/create-account.html").forward(req,res);                
     }
@@ -47,7 +54,7 @@ public class CreateAccountServlet extends HttpServlet{
         Integer userIdObj = (Integer) session.getAttribute("userId");
 
         if(session == null || userIdObj == null){
-            res.getWriter().write("{\"message\":\"Failed\"}");
+            res.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 
