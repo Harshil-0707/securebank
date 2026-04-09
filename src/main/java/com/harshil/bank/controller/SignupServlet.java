@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.*;
 import java.io.*;
 
 import com.harshil.bank.dto.SignUpData;
+import com.harshil.bank.dto.ServiceResponse;
 
 import com.harshil.bank.service.BankService;
 
@@ -48,20 +49,16 @@ public class SignupServlet extends HttpServlet{
 
         res.setContentType("application/json");
         res.setCharacterEncoding("UTF-8");
-
-        PrintWriter out = res.getWriter();
         
-        User user = bs.createUser(sd);
+        ServiceResponse<User> responseObj = bs.createUser(sd);
 
-        if(user != null){
+        if(responseObj.isSuccess()){
             HttpSession session = req.getSession();
-            session.setAttribute("userId", user.getId());
+            session.setAttribute("userId", responseObj.getData().getId());
 
-            out.print("{\"message\":\"Success\"}");
+            res.getWriter().write("{\"message\":\"Success\"}");
         }else{
-            out.print("{\"message\":\"Failed\"}");
+            res.getWriter().write("{\"message\":\"" + responseObj.getMessage() + "\"}");
         }
-        out.flush();
-        
     }
 }
