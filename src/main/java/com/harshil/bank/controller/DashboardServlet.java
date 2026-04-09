@@ -33,7 +33,7 @@ public class DashboardServlet extends HttpServlet{
         res.setCharacterEncoding("UTF-8");
 
         if(session == null || userIdObj == null || accountNumber == null){
-            res.getWriter().write("{\"message\":\"Failed\"}");
+            res.sendRedirect(req.getContextPath() + "/login");
             return;
         }
 
