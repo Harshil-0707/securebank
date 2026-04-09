@@ -7,6 +7,8 @@ import java.sql.Statement;
 
 import java.time.LocalDateTime;
 
+import com.harshil.bank.dto.SignUpData;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +23,7 @@ public class UserDAO{
         this.con = con;
     }
 
-    public User createUser(User user){
+    public User createUser(SignUpData user){
         String sql = "INSERT INTO users (name,email,phone,password) VALUES (?,?,?,?)";
         int rowsAffected = 0;
 
