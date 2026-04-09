@@ -169,12 +169,9 @@
                 .then(data => data.json())
                 .then(data => {
                     if (data.message === "Success") {
-
                         setTimeout(() => {
                             window.location.href = "http://localhost:8080/securebank/bank/dashboard";
                         }, 100);
-                    } else {
-                        console.log(data.message);
                     }
                 })
                 .catch(e => console.error('Error:', e));
