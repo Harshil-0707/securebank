@@ -6,12 +6,9 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 
 import com.harshil.bank.exception.*;
-
 import com.harshil.bank.dto.*;
-
 import com.harshil.bank.dao.*;
 import com.harshil.bank.model.*;
-
 import com.harshil.bank.util.DBConnection;
 
 import org.slf4j.Logger;
@@ -23,25 +20,30 @@ public class BankService{
 
     public BankService(){}
 
-    public User createUser(SignUpData sd){
+    public ServiceResponse<User> createUser(SignUpData sd){
       
         try(Connection connection = DBConnection.getConnection()){
 
             UserDAO userDao = new UserDAO(connection);
 
-            return userDao.createUser(
-                new User(
-                    sd.getName(),
-                    sd.getEmail(),
-                    sd.getPhoneNumber(),
-                    sd.getPassword()
-                )
-            );
+            if(userDao.existsBy("email",sd.getEmail())){
+                return new ServiceResponse<>(false,"Email already registered",null);
+            }
+
+            if(userDao.existsBy("phone",sd.getPhoneNumber())){
+                return new ServiceResponse<>(false,"Phone number already registered",null);
+            }
+
+            User user = userDao.createUser(sd);
+
+            if(user != null){
+                return new ServiceResponse<>(true,"Success",user);
+            }
 
         }catch(Exception e){
             e.printStackTrace();
         }
-        return null;
+        return new ServiceResponse<>(false, "Something went wrong", null);
     }
 
     public User UserExists(LoginData ld){
