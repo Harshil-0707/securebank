@@ -100,6 +100,86 @@ body {
     border-radius: 12px;
 }
 
+/* Section scroll */
+.section {
+    margin-top: 30px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+/* Transaction Card */
+.txn-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px;
+    border-radius: 12px;
+    transition: 0.2s ease;
+}
+
+.txn-card:hover {
+    background: #f1f5f9;
+}
+
+/* Icon */
+.txn-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* Icon colors */
+.txn-icon.credit {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.txn-icon.debit {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* Details */
+.txn-details {
+    flex: 1;
+}
+
+.txn-title {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.txn-sub {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.txn-time {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+/* Amount */
+.txn-amount {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.txn-amount.credit {
+    color: #16a34a;
+}
+
+.txn-amount.debit {
+    color: #dc2626;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .sidebar {
