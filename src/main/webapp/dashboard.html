@@ -55,10 +55,9 @@
             </div>
         </div>
 
-        <!-- Recent Activity -->
         <div class="section">
             <h3>Recent Activity</h3>
-            <p>No transactions yet...</p>
+            <p id="transactions">No transactions yet...</p>
         </div>
 
     </div>
@@ -73,10 +72,35 @@
             .catch(e => console.error("Error fetching data: ", e));
 
         function fillData(data) {
-            const { name, balance, lastTransactionAmount } = data;
-            document.getElementById("userName").textContent = name;
+            const { name, balance, lastTransactionAmount, transactions } = data;
+            document.getElementById("userName").textContent = name.charAt(0).toUpperCase() + name.slice(1);
             document.getElementById("balance").textContent = balance;
             document.getElementById("lastTransactionAmount").textContent = lastTransactionAmount;
+            document.getElementById("transactions").innerHTML =
+                transactions.map((v) => {
+                    const type = v.transactionType.toLowerCase();
+                    const sign = type === "deposit" || type === "transfer_in" ? "+" : "-";
+
+                    return `
+                        <div class="txn-card">
+                            
+                            <div class="txn-icon ${type}">
+                                ${type === "deposit" || type === "transfer_in" ? "↑" : "↓"}
+                            </div>
+
+                            <div class="txn-details">
+                                <p class="txn-title">${v.transactionType.split("_").join(" ")}</p>
+                                <p class="txn-sub">Acc: ${v.accountNumber}</p>
+                                <p class="txn-time">${new Date(v.transactionTime).toLocaleString()}</p>
+                            </div>
+
+                            <div class="txn-amount ${type}">
+                                ${sign} ₹${v.transactionAmount}
+                            </div>
+
+                        </div>
+                    `;
+                }).join("");
 
         }
     });
