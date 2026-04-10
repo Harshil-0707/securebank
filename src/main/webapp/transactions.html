@@ -23,7 +23,64 @@
     </div>
 
     <!-- Main -->
-    <div class="main"></div>
+    <div class="main">
+        <h3>All the Transactions</h3>
+        <p id="transactions">No transactions yet...</p>
+    </div>
 </body>
+
+<script>
+
+    window.addEventListener("DOMContentLoaded", () => {
+        fetch("http://localhost:8080/securebank/bank/dashboard/transactions/api/")
+            .then(data => data.json())
+            .then(data => fillData(data))
+            .catch(e => console.error("Error fetching data: ", e));
+
+        function fillData(data) {
+            document.getElementById("transactions").innerHTML =
+                data.map((v) => {
+                    const type = v.transactionType.toLowerCase();
+                    const sign = type === "deposit" || type === "transfer_in" ? "+" : "-";
+
+                    return `
+                        <div class="txn-card">
+                            
+                            <div class="txn-icon ${type}">
+                                ${type === "deposit" || type === "transfer_in" ? "↑" : "↓"}
+                            </div>
+
+                            <div class="txn-details">
+                                <p class="txn-title">${v.transactionType.split("_").join(" ")}</p>
+                                <p class="txn-sub">Acc: ${v.accountNumber}</p>
+                                <p class="txn-time">${new Date(v.transactionTime).toLocaleString()}</p>
+                            </div>
+
+                            <div class="txn-amount ${type}">
+                                ${sign} ₹${v.transactionAmount}
+                            </div>
+
+                        </div>
+                    `;
+                }).join("");
+
+        }
+    });
+
+    async function logout() {
+        fetch("http://localhost:8080/securebank/logout")
+            .then(data => data.json())
+            .then(data => {
+                if (data.message === "Success") {
+                    setTimeout(() => {
+                        window.location.href = "http://localhost:8080/securebank/";
+                    }, 100);
+                } else {
+                    console.log(data.message);
+                }
+            })
+            .catch(e => console.error("Error logging out: ", e));
+    }
+</script>
 
 </html>
