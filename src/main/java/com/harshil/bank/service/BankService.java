@@ -80,6 +80,7 @@ public class BankService{
         String name = null;
         BigDecimal balance = new BigDecimal("0.00");
         BigDecimal lastTransactionAmount = new BigDecimal("0.00");
+        ArrayList<Transaction> transactions = null;
         
         try(Connection connection = DBConnection.getConnection()){
             
@@ -92,15 +93,15 @@ public class BankService{
             balance = account.getBalance();
 
             TransactionDAO transactionDao = new TransactionDAO(connection);
-            Transaction transaction = transactionDao.getLatestTransaction(accountNumber);
-            if(transaction != null){
-                lastTransactionAmount = transaction.getTransactionAmount();
+            transactions = transactionDao.getTransactions(accountNumber,5);
+            if(transactions.size() != 0){
+                lastTransactionAmount = transactions.get(0).getTransactionAmount();
             }
 
         }catch(Exception e){
             e.printStackTrace();
         }
-        return new DashboardData(name,balance,lastTransactionAmount);
+        return new DashboardData(name,balance,lastTransactionAmount,transactions);
     }
 
     public Account getAccountData(int userId){
@@ -110,6 +111,21 @@ public class BankService{
             e.printStackTrace();
         }
         return null;
+    }
+
+    public ArrayList<Transaction> getAllTransactions(int userId,String accountNumber){
+
+        ArrayList<Transaction> transactions = new ArrayList<>();
+
+        try(Connection connection = DBConnection.getConnection()){
+
+            TransactionDAO transactionDao = new TransactionDAO(connection);
+            transactions = transactionDao.getTransactions(accountNumber,10);
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return transactions;
     }
 
     // public void deposit(){
