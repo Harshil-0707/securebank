@@ -55,7 +55,7 @@ public class AccountDAO{
     public boolean updateBalance(BigDecimal amount,String accountNumber,String transactionType){
         
         String sql = null;
-        if(transactionType.toLowerCase().equals("deposite")){
+        if(transactionType.toLowerCase().equals("deposit")){
             sql = "UPDATE accounts SET balance = balance + ? WHERE account_number = ?";
         }else if(transactionType.toLowerCase().equals("withdraw")){
             sql = "UPDATE accounts SET balance = balance - ? WHERE account_number = ?";
