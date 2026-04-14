@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/securebank/css/dashboardStyle.css">
+    <title>Withdraw</title>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>SecureBank</h2>
+
+        <a href="/securebank/bank/dashboard">Dashboard</a>
+        <a href="/securebank/bank/dashboard/deposit">Deposit</a>
+        <a href="/securebank/bank/dashboard/withdraw">Withdraw</a>
+        <a href="/securebank/bank/dashboard/transfer">Transfer Money</a>
+        <a href="/securebank/bank/dashboard/transactions">Transactions</a>
+        <button onclick="logout()" id="logoutBtn">Logout</button>
+    </div>
+
+    <div class="main">
+
+        <div class="header">
+            <h1>Withdraw</h1>
+            <div class="user">Secure Transaction</div>
+        </div>
+
+        <div class="section">
+            <div id="messageBox"></div>
+            <form onsubmit="handleSubmit(event)">
+                <label for="accountNumber">
+                    Account Number
+                    <input type="text" name="accountNumber" id="accountNumber" required>
+                </label>
+
+                <label for="amount">
+                    Amount
+                    <input type="number" name="amount" id="amount" min="100" required>
+                </label>
+
+                <button type="submit" class="primary-btn withdraw-btn">
+                    Withdraw Money
+                </button>
+
+            </form>
+        </div>
+
+    </div>
+
+</body>
+
+<script>
+
+    function handleSubmit(e) {
+        e.preventDefault();
+
+        const accountNumber = document.getElementById("accountNumber");
+        const amount = document.getElementById("amount");
+        const messageBox = document.getElementById("messageBox");
+
+        submitData();
+
+        function submitData() {
+            fetch("http://localhost:8080/securebank/bank/dashboard/withdraw/api/", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    accountNumber: accountNumber.value,
+                    amount: amount.value,
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.message === "Success") {
+                        messageBox.textContent = "Withdraw successful";
+                        messageBox.style.color = "green";
+
+                        accountNumber.value = "";
+                        amount.value = "";
+                    } else {
+                        messageBox.textContent = data.message;
+                        messageBox.style.color = "red";
+                    }
+                })
+                .catch(err => {
+                    messageBox.textContent = "Something went wrong";
+                    messageBox.style.color = "red";
+                    console.error(err);
+                });
+        }
+    }
+
+
+    async function logout() {
+        fetch("http://localhost:8080/securebank/logout")
+            .then(data => data.json())
+            .then(data => {
+                if (data.message === "Success") {
+                    setTimeout(() => {
+                        window.location.href = "http://localhost:8080/securebank/";
+                    }, 100);
+                } else {
+                    console.log(data.message);
+                }
+            })
+            .catch(e => console.error("Error logging out: ", e));
+    }
+</script>
+
+</html>
