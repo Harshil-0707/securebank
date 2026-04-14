@@ -48,8 +48,6 @@ public class CreateAccountServlet extends HttpServlet{
 
         String json = sb.toString();
 
-        CreateAccountData cad = CreateAccountServlet.mapper.readValue(json,CreateAccountData.class);
-
         HttpSession session = req.getSession(false);
         Integer userIdObj = (Integer) session.getAttribute("userId");
 
@@ -59,6 +57,8 @@ public class CreateAccountServlet extends HttpServlet{
         }
 
         int userId = userIdObj;
+
+        CreateAccountData cad = CreateAccountServlet.mapper.readValue(json,CreateAccountData.class);
 
         cad.setUserId(userId);
 
