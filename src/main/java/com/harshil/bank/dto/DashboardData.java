@@ -10,32 +10,16 @@ public class DashboardData{
     private String name;
     private BigDecimal balance;
     private BigDecimal lastTransactionAmount;
+    private String accountNumber;
     private ArrayList<Transaction> transactions;
 
     public DashboardData(){}
 
-    public DashboardData(String name,BigDecimal balance,BigDecimal lastTransactionAmount,ArrayList<Transaction> transactions){
+    public DashboardData(String name,BigDecimal balance,BigDecimal lastTransactionAmount,String accountNumber,ArrayList<Transaction> transactions){
         this.name = name;
         this.balance = balance;
         this.lastTransactionAmount = lastTransactionAmount;
-        this.transactions = transactions;
-    }
-
-    // setters
-
-    public void setName(String name){
-        this.name = name;
-    }
-
-    public void setBalance(BigDecimal balance){
-        this.balance = balance;
-    }
-
-    public void setLastTransactionAmount(BigDecimal lastTransactionAmount){
-        this.lastTransactionAmount = lastTransactionAmount;
-    }
-
-    public void setTransactions(ArrayList<Transaction> transactions){
+        this.accountNumber = accountNumber;
         this.transactions = transactions;
     }
 
@@ -51,6 +35,10 @@ public class DashboardData{
 
     public BigDecimal getLastTransactionAmount(){
         return this.lastTransactionAmount;
+    }
+
+    public String getAccountNumber(){
+        return this.accountNumber;
     }
 
     public ArrayList<Transaction> getTransactions(){
