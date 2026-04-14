@@ -15,17 +15,23 @@
         <h2>SecureBank</h2>
 
         <a href="/securebank/bank/dashboard">Dashboard</a>
-        <a href="/securebank/bank/dashboard/view-balance">View Balance</a>
+        <a href="/securebank/bank/dashboard/deposit">Deposit</a>
+        <a href="/securebank/bank/dashboard/withdraw">Withdraw</a>
         <a href="/securebank/bank/dashboard/transfer">Transfer Money</a>
         <a href="/securebank/bank/dashboard/transactions">Transactions</a>
-        <a href="/securebank/">Logout</a>
+        <button onclick="logout()" id="logoutBtn">Logout</button>
 
     </div>
 
-    <!-- Main -->
     <div class="main">
-        <h3>All the Transactions</h3>
-        <p id="transactions">No transactions yet...</p>
+        <div class="header">
+            <h1>Transactions</h1>
+            <div class="user">History</div>
+        </div>
+        <div class="transactions-box">
+            <h3 class="page-title">All Transactions</h3>
+            <div id="transactions">No transactions yet...</div>
+        </div>
     </div>
 </body>
 
@@ -38,32 +44,49 @@
             .catch(e => console.error("Error fetching data: ", e));
 
         function fillData(data) {
-            document.getElementById("transactions").innerHTML =
-                data.map((v) => {
-                    const type = v.transactionType.toLowerCase();
-                    const sign = type === "deposit" || type === "transfer_in" ? "+" : "-";
+            const container = document.getElementById("transactions");
 
-                    return `
-                        <div class="txn-card">
-                            
-                            <div class="txn-icon ${type}">
-                                ${type === "deposit" || type === "transfer_in" ? "↑" : "↓"}
-                            </div>
+            if (!data || data.length === 0) {
+                container.innerHTML = `<div class="empty-state">No transactions yet...</div>`;
+                return;
+            }
 
-                            <div class="txn-details">
-                                <p class="txn-title">${v.transactionType.split("_").join(" ")}</p>
-                                <p class="txn-sub">Acc: ${v.accountNumber}</p>
-                                <p class="txn-time">${new Date(v.transactionTime).toLocaleString()}</p>
-                            </div>
+            container.innerHTML = data.map(v => {
+                const type = v.transactionType.toLowerCase();
+                const isCredit = type === "deposit" || type === "transfer_in";
 
-                            <div class="txn-amount ${type}">
-                                ${sign} ₹${v.transactionAmount}
-                            </div>
+                const icon = isCredit ? "↑" : "↓";
+                const sign = isCredit ? "+" : "-";
 
-                        </div>
-                    `;
-                }).join("");
+                const title = v.transactionType
+                    .toLowerCase()
+                    .replaceAll("_", " ")
+                    .replace(/\b\w/g, c => c.toUpperCase());
 
+                const date = new Date(v.transactionTime).toLocaleString();
+
+                return `
+            <div class="txn-card">
+
+                <div class="txn-icon ${type}">
+                    ${icon}
+                </div>
+
+                <div class="txn-details">
+                    <div class="txn-title">${title}</div>
+                    <div class="txn-sub">Account • ${v.accountNumber}</div>
+                    <div class="txn-time">${date}</div>
+                </div>
+
+                <div class="txn-right">
+                    <div class="txn-amount ${type}">
+                        ${sign} ₹${Number(v.transactionAmount).toLocaleString("en-IN")}
+                    </div>
+                </div>
+
+            </div>
+        `;
+            }).join("");
         }
     });
 
