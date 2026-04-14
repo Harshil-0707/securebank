@@ -5,26 +5,123 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/securebank/css/dashboardStyle.css">
-
-
-    <title>Transfer</title>
+    <title>Transfer Money</title>
 </head>
 
 <body>
+
     <!-- Sidebar -->
     <div class="sidebar">
         <h2>SecureBank</h2>
 
         <a href="/securebank/bank/dashboard">Dashboard</a>
-        <a href="/securebank/bank/dashboard/view-balance">View Balance</a>
+        <a href="/securebank/bank/dashboard/deposit">Deposit</a>
+        <a href="/securebank/bank/dashboard/withdraw">Withdraw</a>
         <a href="/securebank/bank/dashboard/transfer">Transfer Money</a>
         <a href="/securebank/bank/dashboard/transactions">Transactions</a>
-        <a href="/securebank/">Logout</a>
-
+        <button onclick="logout()" id="logoutBtn">Logout</button>
     </div>
 
     <!-- Main -->
-    <div class="main"></div>
+    <div class="main">
+
+        <div class="header">
+            <h1>Transfer Money</h1>
+            <div class="user">Secure Transfer</div>
+        </div>
+
+        <div class="section">
+
+            <div id="messageBox"></div>
+
+            <form onsubmit="handleSubmit(event)">
+
+                <label for="senderAccountNumber">
+                    Sender Account Number
+                    <input type="text" id="senderAccountNumber" name="senderAccountNumber" minlength="6" maxlength="6"
+                        required>
+                </label>
+
+                <label for="receiverAccountNumber">
+                    Receiver Account Number
+                    <input type="text" id="receiverAccountNumber" name="receiverAccountNumber" minlength="6"
+                        maxlength="6" required>
+                </label>
+
+                <label for="amount">
+                    Amount
+                    <input type="number" id="amount" name="amount" min="100" required>
+                </label>
+
+                <button type="submit" class="primary-btn transfer-btn">
+                    Transfer Money
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
 </body>
+
+<script>
+    function handleSubmit(e) {
+        e.preventDefault();
+
+        const senderAccountNumber =
+            document.getElementById("senderAccountNumber").value;
+
+        const receiverAccountNumber =
+            document.getElementById("receiverAccountNumber").value;
+
+        const amount =
+            document.getElementById("amount").value;
+
+        const messageBox =
+            document.getElementById("messageBox");
+
+        fetch("http://localhost:8080/securebank/bank/dashboard/transfer/api/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                senderAccountNumber,
+                receiverAccountNumber,
+                amount
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.message === "Success") {
+                    messageBox.textContent = "Money transferred successfully";
+                    messageBox.style.color = "green";
+
+                    document.getElementById("senderAccountNumber").value = "";
+                    document.getElementById("receiverAccountNumber").value = "";
+                    document.getElementById("amount").value = "";
+                } else {
+                    messageBox.textContent = data.message;
+                    messageBox.style.color = "red";
+                }
+            })
+            .catch(err => {
+                messageBox.textContent = "Something went wrong";
+                messageBox.style.color = "red";
+                console.error(err);
+            });
+    }
+
+    function logout() {
+        fetch("http://localhost:8080/securebank/logout")
+            .then(data => data.json())
+            .then(data => {
+                if (data.message === "Success") {
+                    window.location.href = "http://localhost:8080/securebank/";
+                }
+            });
+    }
+</script>
 
 </html>
