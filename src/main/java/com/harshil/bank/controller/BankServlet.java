@@ -34,8 +34,12 @@ public class BankServlet extends HttpServlet {
                 req.getRequestDispatcher("/dashboard.html").forward(req, res);
                 break;
 
-            case "/dashboard/view-balance":
-                req.getRequestDispatcher("/viewBalance.html").forward(req, res);
+            case "/dashboard/deposit":
+                req.getRequestDispatcher("/deposit.html").forward(req,res);
+                break;
+
+            case"/dashboard/withdraw":
+                req.getRequestDispatcher("/withdraw.html").forward(req,res);
                 break;
 
             case "/dashboard/transfer":
