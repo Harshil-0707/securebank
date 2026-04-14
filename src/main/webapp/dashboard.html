@@ -16,7 +16,8 @@
         <h2>SecureBank</h2>
 
         <a href="/securebank/bank/dashboard">Dashboard</a>
-        <a href="/securebank/bank/dashboard/view-balance">View Balance</a>
+        <a href="/securebank/bank/dashboard/deposit">Deposit</a>
+        <a href="/securebank/bank/dashboard/withdraw">Withdraw</a>
         <a href="/securebank/bank/dashboard/transfer">Transfer Money</a>
         <a href="/securebank/bank/dashboard/transactions">Transactions</a>
         <button onclick="logout()" id="logoutBtn">Logout</button>
@@ -50,8 +51,8 @@
             </div>
 
             <div class="card">
-                <h3>Account Status</h3>
-                <p>Active</p>
+                <h3>Account Number</h3>
+                <p id="accountNumber">0x0y0z</p>
             </div>
         </div>
 
@@ -72,10 +73,12 @@
             .catch(e => console.error("Error fetching data: ", e));
 
         function fillData(data) {
-            const { name, balance, lastTransactionAmount, transactions } = data;
+            const { name, balance, lastTransactionAmount, accountNumber, transactions } = data;
+            console.log(accountNumber);
             document.getElementById("userName").textContent = name.charAt(0).toUpperCase() + name.slice(1);
             document.getElementById("balance").textContent = balance;
             document.getElementById("lastTransactionAmount").textContent = lastTransactionAmount;
+            document.getElementById("accountNumber").textContent = accountNumber;
             document.getElementById("transactions").innerHTML =
                 transactions.map((v) => {
                     const type = v.transactionType.toLowerCase();
@@ -100,7 +103,7 @@
 
                         </div>
                     `;
-                }).join("");
+                }).join("") || "No transactions yet...";
 
         }
     });
