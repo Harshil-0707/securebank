@@ -1,3 +1,4 @@
+/* Reset */
 * {
     margin: 0;
     padding: 0;
@@ -5,17 +6,24 @@
     font-family: Arial, sans-serif;
 }
 
+/* Layout */
 body {
     display: flex;
     min-height: 100vh;
     background: #f4f6f8;
 }
 
+.main {
+    flex: 1;
+    padding: 30px;
+}
+
+/* Sidebar */
 .sidebar {
     width: 250px;
-    background: #1e293b;
-    color: white;
     padding: 20px;
+    color: #fff;
+    background: #1e293b;
 }
 
 .sidebar h2 {
@@ -24,169 +32,291 @@ body {
 
 .sidebar a,
 .sidebar #logoutBtn {
-    width: 100%;
     display: block;
-    color: #cbd5f5;
-    text-decoration: none;
-    margin: 15px 0;
+    width: 100%;
+    margin: 12px 0;
     padding: 10px;
-    border-radius: 8px;
     border: none;
-    outline: none;
-    background: #1e293b;
+    border-radius: 8px;
+    background: transparent;
+    color: #cbd5f5;
     text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.2s ease;
 }
 
 .sidebar a:hover,
 .sidebar #logoutBtn:hover {
     background: #334155;
-    color: white;
-}
-
-.main {
-    flex: 1;
-    padding: 20px;
+    color: #fff;
 }
 
 /* Header */
 .header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    background: white;
-    padding: 15px 20px;
-    border-radius: 10px;
+    justify-content: space-between;
     margin-bottom: 20px;
+    padding: 15px 20px;
+    border-radius: 12px;
+    background: #fff;
 }
 
 .header h1 {
-    font-size: 20px;
+    font-size: 22px;
+    color: #1e293b;
 }
 
-.header .user {
+.user {
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #1e293b;
+    color: #fff;
     font-size: 14px;
 }
 
-/* Cards */
+/* Cards / Sections */
 .cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
+    margin-bottom: 25px;
 }
 
-.card {
-    background: white;
+.card,
+.section,
+.transactions-box {
     padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.transactions-box {
+    padding: 25px;
 }
 
 .card h3 {
     margin-bottom: 10px;
     font-size: 16px;
+    color: #475569;
 }
 
 .card p {
     font-size: 22px;
-    font-weight: bold;
+    font-weight: 700;
     color: #1e293b;
 }
 
-/* Section */
-.section {
-    margin-top: 30px;
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
+.page-title {
+    margin-bottom: 18px;
+    font-size: 20px;
+    color: #1e293b;
 }
 
-/* Section scroll */
-.section {
-    margin-top: 30px;
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    max-height: 350px;
+/* Transactions */
+#transactions {
+    max-height: 600px;
+    margin-top: 15px;
     overflow-y: auto;
+    padding-right: 6px;
 }
 
-/* Transaction Card */
+.empty-state {
+    padding: 30px;
+    text-align: center;
+    color: #64748b;
+    font-size: 15px;
+}
+
 .txn-card {
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 14px;
-    border-radius: 12px;
+    gap: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #fff;
     transition: 0.2s ease;
 }
 
-.txn-card:hover {
-    background: #f1f5f9;
+.txn-card:last-child {
+    margin-bottom: 0;
 }
 
-/* Icon */
+.txn-card:hover {
+    background: #f8fafc;
+}
+
 .txn-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
+    min-width: 42px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: 700;
 }
 
-/* Icon colors */
-.txn-icon.credit {
+.txn-icon.deposit,
+.txn-icon.transfer_in {
     background: #dcfce7;
     color: #16a34a;
 }
 
-.txn-icon.debit {
+.txn-icon.withdraw,
+.txn-icon.transfer_out {
     background: #fee2e2;
     color: #dc2626;
 }
 
-/* Details */
 .txn-details {
     flex: 1;
+    min-width: 0;
 }
 
 .txn-title {
-    font-weight: 600;
-    font-size: 14px;
+    margin-bottom: 4px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
 }
 
-.txn-sub {
+.txn-sub,
+.txn-time {
     font-size: 12px;
     color: #64748b;
 }
 
 .txn-time {
-    font-size: 11px;
-    color: #94a3b8;
+    margin-top: 3px;
 }
 
-/* Amount */
+.txn-right {
+    text-align: right;
+}
+
 .txn-amount {
-    font-weight: bold;
-    font-size: 15px;
+    font-size: 16px;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
-.txn-amount.credit {
+.txn-amount.deposit,
+.txn-amount.transfer_in {
     color: #16a34a;
 }
 
-.txn-amount.debit {
+.txn-amount.withdraw,
+.txn-amount.transfer_out {
     color: #dc2626;
+}
+
+/* Scrollbar */
+#transactions::-webkit-scrollbar {
+    width: 8px;
+}
+
+#transactions::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+#transactions::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Forms */
+.section form label {
+    display: block;
+    margin: 15px 0 6px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.section form input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    outline: none;
+}
+
+.section form input:focus {
+    border-color: #2563eb;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+}
+
+/* Buttons */
+.primary-btn {
+    width: 100%;
+    margin-top: 18px;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.deposit-btn {
+    background: #16a34a;
+}
+
+.deposit-btn:hover {
+    background: #15803d;
+}
+
+.withdraw-btn {
+    background: #dc2626;
+}
+
+.withdraw-btn:hover {
+    background: #b91c1c;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-    .sidebar {
-        display: none;
-    }
-
     body {
         flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+    }
+
+    .main {
+        padding: 15px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 640px) {
+    .txn-card {
+        align-items: flex-start;
+    }
+
+    .txn-right {
+        margin-left: auto;
+    }
+
+    .txn-amount {
+        font-size: 14px;
     }
 }
