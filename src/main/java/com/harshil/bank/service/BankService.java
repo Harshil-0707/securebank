@@ -101,7 +101,7 @@ public class BankService{
         }catch(Exception e){
             e.printStackTrace();
         }
-        return new DashboardData(name,balance,lastTransactionAmount,transactions);
+        return new DashboardData(name,balance,lastTransactionAmount,accountNumber,transactions);
     }
 
     public Account getAccountData(int userId){
@@ -128,225 +128,221 @@ public class BankService{
         return transactions;
     }
 
-    // public void deposit(){
+    public String deposit(TransactionData transactionData) {
 
-    //     String accountNumber = getAccountNumberFromUser(sc,"Enter Account Number: ");
-    //     if(accountNumber == null) return;
+        try (Connection con = DBConnection.getConnection()) {
 
-    //     BigDecimal amount = getAmountFromUser(sc,"Enter Amount to Deposit: ");
+            String accountNumber = transactionData.getAccountNumber();
+            BigDecimal amount = transactionData.getAmount();
 
-    //     Connection con = DBConnection.getConnection();
+            BankService.logger.info(
+                "Deposit initiated account={} amount={}",
+                accountNumber,
+                amount
+            );
 
-    //     AccountDAO accountDao = new AccountDAO(con);
-        
-    //     if(!accountDao.updateBalance(amount,accountNumber,"deposite")){
-    //         System.out.println("Unable to updating balance!!!");
-    //         return;
-    //     }
-    //     Transaction t = new Transaction(accountNumber,"deposite",amount);
-    //     TransactionDAO transactionDao = new TransactionDAO(con);
-    //     if(!transactionDao.makeTransaction(t)){
-    //         System.out.println("Unable to make transaction!!!");
-    //         return;
-    //     }
-        
-    //     System.out.println("-----------------------------------------");
-    //     System.out.println("Deposit Successful!");
-    //     System.out.println("Deposited Amount: " + amount);
-    //     System.out.println("Updated Balance: " + accountDao.getBalance(accountNumber));
-    //     System.out.println("Transaction ID: "+ t.getTransactionId());
-    //     System.out.println("-----------------------------------------\n");
+            AccountDAO accountDao = new AccountDAO(con);
 
-    //     BankService.logger.info("Deposit successful account number = {} amount = {}",accountNumber,amount);
+            if (!accountDao.updateBalance(amount, accountNumber, "DEPOSIT")) {
+                BankService.logger.warn(
+                    "Deposit failed: Invalid account number={}",
+                    accountNumber
+                );
+                return "Wrong account number";
+            }
 
-    // }
+            Transaction transaction =
+                new Transaction(accountNumber, "DEPOSIT", amount);
 
-    // public void withdraw() throws Exception{
-        
-    //     String accountNumber = getAccountNumberFromUser(sc,"Enter Account Number: ");
-    //     if(accountNumber == null) return;
-        
-    //     BigDecimal amount = getAmountFromUser(sc,"Enter Amount to Withdraw: ");
+            TransactionDAO transactionDao = new TransactionDAO(con);
 
-    //     Connection con = DBConnection.getConnection();
+            if (!transactionDao.makeTransaction(transaction)) {
+                BankService.logger.warn(
+                    "Deposit failed: Transaction registration error account={}",
+                    accountNumber
+                );
+                return "Transaction registration error";
+            }
 
-    //     AccountDAO accountDao = new AccountDAO(con);
+            BankService.logger.info(
+                "Deposit successful account={} amount={}",
+                accountNumber,
+                amount
+            );
 
-    //     BigDecimal availableBalance = accountDao.getBalance(accountNumber);
-    //     BigDecimal minimumBalance = new BigDecimal("500");
+            return "Success";
 
-    //     if (availableBalance.subtract(amount).compareTo(minimumBalance) < 0) {
-           
-    //         BankService.logger.info("Withdrawal initiated account={} amount={}", accountNumber,amount);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Something went wrong";
+        }
+    }
 
-    //         if(!accountDao.updateBalance(amount,accountNumber,"withdraw")){
-    //             BankService.logger.warn("Withdraw failed: Minimum balance of 500 must be maintained.");
-    //             throw new MinimumBalanceException("Minimum balance of 500 must be maintained.");
-    //         }
+    public String withdraw(TransactionData transactionData) {
 
-    //         TransactionDAO transactionDao = new TransactionDAO(con);
+        try (Connection con = DBConnection.getConnection()) {
 
-    //         Transaction t = new Transaction(accountNumber,"withdraw",amount);
+            String accountNumber = transactionData.getAccountNumber();
+            BigDecimal amount = transactionData.getAmount();
 
-    //         transactionDao.makeTransaction(t);
+            AccountDAO accountDao = new AccountDAO(con);
 
-    //         System.out.println("-----------------------------------------");
-    //         System.out.println("Withdrawal Successful!");
-    //         System.out.println("Withdrawn Amount: " + amount);
-    //         System.out.println("Remaining Balance: " + availableBalance.subtract(amount));
-    //         System.out.println("Transaction ID: "+ t.getTransactionId());
-    //         System.out.println("-----------------------------------------\n");
+            BigDecimal availableBalance = accountDao.getBalance(accountNumber);
+            BigDecimal minimumBalance = new BigDecimal("500");
 
-    //         BankService.logger.info("Withdrawal successful");
+            BankService.logger.info(
+                "Withdrawal initiated account={} amount={}",
+                accountNumber,
+                amount
+            );
 
-    //     }else{
-    //         BankService.logger.warn("Withdarw failed: Available balance is less than withdraw amound.");
-    //         throw new InsufficientBalanceException(
-    //             "Available balance: " + availableBalance + ", Tried to withdraw: " + amount
-    //         );
-    //     }
+            if (availableBalance.subtract(amount).compareTo(minimumBalance) < 0) {
+                BankService.logger.warn(
+                    "Withdraw failed: Minimum balance of 500 must be maintained."
+                );
+                throw new MinimumBalanceException(
+                    "Minimum balance of 500 must be maintained."
+                );
+            }
 
-    // }
+            if (!accountDao.updateBalance(amount, accountNumber, "withdraw")) {
+                return "Balance update failed";
+            }
 
-    // public void transfer() throws Exception {
-       
-    //     String senderAccountNumber = getAccountNumberFromUser(sc,"Enter Sender Account Number: ");
-    //     if(senderAccountNumber == null) return;
-       
-    //     String receiverAccountNumber = getAccountNumberFromUser(sc,"Enter Receiver Account Number: ");
-    //     if(receiverAccountNumber == null) return;
-        
-    //     Connection con = DBConnection.getConnection();
+            TransactionDAO transactionDao = new TransactionDAO(con);
+            Transaction transaction =
+                new Transaction(accountNumber, "withdraw", amount);
 
-    //     if(senderAccountNumber.equals(receiverAccountNumber)){
-    //         logger.warn("Transfer failed: sender and receiver account are the same account={}",
-    //         senderAccountNumber);
-    //         throw new SameAccountTransferException("Sender and Receiver's account numbers cannot be same.");
-    //     }
-            
-    //     BigDecimal amount = getAmountFromUser(sc,"Enter Amount to Transfer: ");
+            if (!transactionDao.makeTransaction(transaction)) {
+                return "Transaction registration error";
+            }
 
-    //     AccountDAO accountDao = new AccountDAO(con);
+            BankService.logger.info("Withdrawal successful");
+            return "Success";
 
-    //     BigDecimal senderAvailableBalance = accountDao.getBalance(senderAccountNumber);
-    //     if (amount.compareTo(senderAvailableBalance) > 0) {
-    //         logger.warn("Transfer failed: Available balance is less than withdraw balance");
-    //         throw new InsufficientBalanceException(
-    //             "Available balance: " + senderAvailableBalance + ", Tried to withdraw: " + amount
-    //         );
-    //     }
+        } catch (MinimumBalanceException e) {
+            BankService.logger.warn(e.getMessage());
+            return e.getMessage();
 
-    //     try{
-    //         con.setAutoCommit(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Something went wrong";
+        }
+    }
 
-    //         System.out.println("\n-----------------------------------------");
-    //         System.out.println("Processing Transfer...");
-    //         System.out.println("-----------------------------------------");
-            
-    //         if(!accountDao.updateBalance(amount,senderAccountNumber,"withdraw")){
-    //             throw new RuntimeException("Could not Transfer money from sender's account!!!");
-    //         }
-           
-    //         if(!accountDao.updateBalance(amount,receiverAccountNumber,"deposite")){
-    //             throw new RuntimeException("Could not Transfer money to receiver's account!!!");
-    //         }
-            
-    //         BankService.logger.info("Transfer initiated from={} to={} amount={}",senderAccountNumber,receiverAccountNumber,amount);
-           
-    //         Transaction t1 = new Transaction(senderAccountNumber,"TRANSFER_OUT",amount);
-            
-    //         TransactionDAO transactionDao = new TransactionDAO(con);
+    public String transfer(TransferData transferData) {
 
-    //         if(!transactionDao.makeTransaction(t1)){
-    //             throw new RuntimeException("Transaction record failed");
-    //         }
+        Connection con = null;
 
-    //         Transaction t2 = new Transaction(receiverAccountNumber,"TRANSFER_IN",amount);
+        try {
+            con = DBConnection.getConnection();
+            con.setAutoCommit(false);
 
-    //         if(!transactionDao.makeTransaction(t2)){
-    //             throw new RuntimeException("Transaction record failed");
-    //         }
+            String senderAccountNumber = transferData.getSenderAccountNumber();
+            String receiverAccountNumber = transferData.getReceiverAccountNumber();
+            BigDecimal amount = transferData.getAmount();
 
-    //         con.commit();
+            if (senderAccountNumber.equals(receiverAccountNumber)) {
+                logger.warn(
+                    "Transfer failed: sender and receiver are same account={}",
+                    senderAccountNumber
+                );
+                throw new SameAccountTransferException(
+                    "Sender and receiver account numbers cannot be the same."
+                );
+            }
 
-    //         BankService.logger.info("Transfer from={} to={} amount={} successful.",senderAccountNumber,receiverAccountNumber,amount);
+            AccountDAO accountDao = new AccountDAO(con);
+            TransactionDAO transactionDao = new TransactionDAO(con);
 
-    //         System.out.println("Transfer Successful!");
-    //         System.out.println("Transferred Amount: " + amount);
-    //         System.out.println("Sender New Balance: " + (senderAvailableBalance.subtract(amount)));
-    //         System.out.println("Receiver New Balance: " + (accountDao.getBalance(receiverAccountNumber)));
-    //         System.out.println("-----------------------------------------");
-       
-    //     }catch(Exception e){
-    //         try {
-    //             con.rollback();
-    //             System.out.println("Transfer Failed! Transaction Rolled Back.");
-    //             BankService.logger.error("Transfer failed: ",e);
-    //         } catch (Exception ex) {
-    //             BankService.logger.error("Transfer rollback error: ",ex);
-    //             ex.printStackTrace();
-    //         }
-    //     }finally{
-    //         try {
-    //             con.setAutoCommit(true);
-    //         } catch (Exception e) {
-    //             BankService.logger.error("AutoCommit error: ",e);
-    //             e.printStackTrace();
-    //         }
-    //     }
-    // }
+            BigDecimal senderBalance = accountDao.getBalance(senderAccountNumber);
 
-    // public void checkBalance(){
-    //     String accountNumber = getAccountNumberFromUser(sc,"Enter Account Number: ");
-    //     if(accountNumber == null) return;
+            if (amount.compareTo(senderBalance) > 0) {
+                logger.warn(
+                    "Transfer failed: insufficient balance account={} balance={} requested={}",
+                    senderAccountNumber,
+                    senderBalance,
+                    amount
+                );
 
-    //     Connection con = DBConnection.getConnection();
+                throw new InsufficientBalanceException(
+                    "Available balance: " + senderBalance +
+                    ", Transfer amount: " + amount
+                );
+            }
 
-    //     AccountDAO accountDao = new AccountDAO(con);
+            boolean withdrawn =
+                accountDao.updateBalance(amount, senderAccountNumber, "withdraw");
 
-    //     Account a = accountDao.checkBalance(accountNumber);
+            if (!withdrawn) {
+                throw new RuntimeException(
+                    "Could not debit sender account."
+                );
+            }
 
-    //     System.out.println("-----------------------------------------");
-    //     System.out.println("Account Number: " + accountNumber);
-    //     System.out.println("Account Type: " + a.getAccountType().toUpperCase());
-    //     System.out.println("Current Balance: " + a.getBalance());
-    //     System.out.println("-----------------------------------------\n");
-    //     BankService.logger.info("Checked Balance");
-    // }
+            boolean deposited =
+                accountDao.updateBalance(amount, receiverAccountNumber, "deposit");
 
-    // public void viewTransactionHistory() {
-    //     String accountNumber = getAccountNumberFromUser(sc,"Enter Account Number: ");
-    //     if(accountNumber == null) return;
+            if (!deposited) {
+                throw new RuntimeException(
+                    "Could not credit receiver account."
+                );
+            }
 
-    //     Connection con = DBConnection.getConnection();
+            Transaction senderTransaction =
+                new Transaction(senderAccountNumber, "TRANSFER_OUT", amount);
 
-    //     TransactionDAO transactionDao = new TransactionDAO(con);
+            Transaction receiverTransaction =
+                new Transaction(receiverAccountNumber, "TRANSFER_IN", amount);
 
-    //     ArrayList<Transaction> transactionHistory =
-    //             transactionDao.getAllTransactions(accountNumber);
+            if (!transactionDao.makeTransaction(senderTransaction)) {
+                throw new RuntimeException(
+                    "Sender transaction record failed."
+                );
+            }
 
-    //     String line = "------------------------------------------------------------------";
+            if (!transactionDao.makeTransaction(receiverTransaction)) {
+                throw new RuntimeException(
+                    "Receiver transaction record failed."
+                );
+            }
 
-    //     System.out.println(line);
+            con.commit();
 
-    //     // Header formatting
-    //     System.out.printf("%-15s | %-10s | %-10s | %-15s%n",
-    //             "Transaction ID", "Type", "Amount", "Date");
+            logger.info(
+                "Transfer successful from={} to={} amount={}",
+                senderAccountNumber,
+                receiverAccountNumber,
+                amount
+            );
 
-    //     System.out.println(line);
+            return "Success";
 
-    //     // Row formatting
-    //     for (Transaction t : transactionHistory) {
-    //         System.out.printf("%-15d | %-10s | %-10.2f | %-15s%n",
-    //                 t.getTransactionId(),
-    //                 t.getTransactionType(),
-    //                 t.getTransactionAmount(),
-    //                 t.getTransactionTime()
-    //         );
-    //     }
+        } catch (Exception e) {
 
-    //     System.out.println(line + "\n");
-    //     BankService.logger.info("Viewed Transaction History");
-    // }
+            if (con != null) {
+                try {
+                    con.rollback();
+                    logger.error("Transfer rolled back.");
+                } catch (Exception rollbackEx) {
+                    logger.error("Rollback failed", rollbackEx);
+                }
+            }
+
+            logger.error("Transfer failed", e);
+            return e.getMessage();
+
+        } finally {
+
+            if (con != null) {
+                try {
+                    con.setAutoCommit(true);
+                    con.close();
+                } catch (Exception e) {
+                    logger.error("Connection close error", e);
+                }
+            }
+        }
+    }
 
 }
