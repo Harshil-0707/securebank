@@ -12,14 +12,6 @@ public class TransactionData{
 
     // setter
 
-    public void setAccountNumber(String accountNumber){
-        this.accountNumber = accountNumber;
-    }
-
-    public void setAmount(BigDecimal amount){
-        this.amount = amount;
-    }
-
     public void setUserId(int userId){
         this.userId = userId;
     }

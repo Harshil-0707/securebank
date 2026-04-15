@@ -163,9 +163,7 @@
                     if (data.message === "Success") {
                         submitError.textContent = "";
 
-                        setTimeout(() => {
-                            window.location.href = "http://localhost:8080/securebank/bank/dashboard";
-                        }, 100);
+                        window.location.href = "http://localhost:8080/securebank/bank/dashboard";
                     } else {
                         submitError.textContent = "Invalid email or password";
                     }

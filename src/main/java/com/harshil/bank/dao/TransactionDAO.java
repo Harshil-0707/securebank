@@ -39,11 +39,9 @@ public class TransactionDAO{
                 }
             }catch(Exception e){
                 TransactionDAO.logger.error("Error setting id for transaction",e);
-                e.printStackTrace();
             }
         }catch(Exception e){
             TransactionDAO.logger.error("Error inserting transaction into database",e);
-            e.printStackTrace();
         }
         return rowsAffected > 0;
     }
@@ -75,31 +73,4 @@ public class TransactionDAO{
         }
         return transactions;
     }
-
-    // public ArrayList<Transaction> getAllTransactions(String accountNumber){
-    //     String sql = "SELECT * FROM transactions WHERE account_number = ? ORDER BY transaction_date DESC";
-
-    //     ArrayList<Transaction> transactions = new ArrayList<>();
-
-    //     try(PreparedStatement ps = con.prepareStatement(sql)){
-    //         ps.setString(1,accountNumber);
-    //         try(ResultSet rs = ps.executeQuery()){
-    //             while(rs.next()){
-    //                 int id = rs.getInt("transaction_id");
-    //                 String type = rs.getString("type");
-    //                 BigDecimal amount = rs.getBigDecimal("amount");
-    //                 LocalDateTime date = rs.getTimestamp("transaction_date").toLocalDateTime();
-    //                 Transaction t = new Transaction(accountNumber,type,amount);
-    //                 t.setTransactionTime(date);
-    //                 t.setTransactionId(id);
-    //                 transactions.add(t);
-    //             }
-    //         }catch(Exception e){
-    //             TransactionDAO.logger.error("Error setting transaction details for account number = {}",accountNumber,e);
-    //         }
-    //     }catch(Exception e){
-    //         TransactionDAO.logger.error("Error getting transaction details for the account number = {}",accountNumber,e);
-    //     }
-    //     return transactions;
-    // }
 }

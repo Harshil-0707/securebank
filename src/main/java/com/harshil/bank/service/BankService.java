@@ -41,7 +41,7 @@ public class BankService{
             }
 
         }catch(Exception e){
-            e.printStackTrace();
+            BankService.logger.error("Error creating user:: ",e.getMessage());
         }
         return new ServiceResponse<>(false, "Something went wrong", null);
     }
@@ -50,7 +50,7 @@ public class BankService{
         try(Connection connection = DBConnection.getConnection()){
             return new UserDAO(connection).userExists(ld.getEmail(),ld.getPassword());
         }catch(Exception e){
-            e.printStackTrace();
+            BankService.logger.error("Checking if user exists:: ",e.getMessage());
         }
         return null;
     }
@@ -69,7 +69,7 @@ public class BankService{
             if(accountDao.createAccount(account)) return account;
             
         }catch(Exception e){
-            e.printStackTrace();
+            BankService.logger.error("Creating user account:: ",e.getMessage());
         }
         return null;
 
@@ -99,7 +99,7 @@ public class BankService{
             }
 
         }catch(Exception e){
-            e.printStackTrace();
+            BankService.logger.error("Getting dashboard data:: ",e.getMessage());
         }
         return new DashboardData(name,balance,lastTransactionAmount,accountNumber,transactions);
     }
@@ -108,7 +108,7 @@ public class BankService{
         try(Connection connection = DBConnection.getConnection()){
             return new AccountDAO(connection).getAccountData(userId);
         }catch(Exception e){
-            e.printStackTrace();
+            BankService.logger.error("Getting account data:: ",e.getMessage());
         }
         return null;
     }
@@ -123,7 +123,7 @@ public class BankService{
             transactions = transactionDao.getTransactions(accountNumber,10);
 
         }catch(Exception e){
-            e.printStackTrace();
+            BankService.logger.error("Getting transactions:: ",e.getMessage());
         }
         return transactions;
     }
@@ -173,7 +173,7 @@ public class BankService{
             return "Success";
 
         } catch (Exception e) {
-            e.printStackTrace();
+            BankService.logger.error("Depositing amount:: ",e.getMessage());
             return "Something went wrong";
         }
     }
@@ -225,7 +225,7 @@ public class BankService{
             return e.getMessage();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            BankService.logger.error(e.getMessage());
             return "Something went wrong";
         }
     }
@@ -243,7 +243,7 @@ public class BankService{
             BigDecimal amount = transferData.getAmount();
 
             if (senderAccountNumber.equals(receiverAccountNumber)) {
-                logger.warn(
+                BankService.logger.warn(
                     "Transfer failed: sender and receiver are same account={}",
                     senderAccountNumber
                 );
@@ -258,7 +258,7 @@ public class BankService{
             BigDecimal senderBalance = accountDao.getBalance(senderAccountNumber);
 
             if (amount.compareTo(senderBalance) > 0) {
-                logger.warn(
+                BankService.logger.warn(
                     "Transfer failed: insufficient balance account={} balance={} requested={}",
                     senderAccountNumber,
                     senderBalance,
@@ -309,7 +309,7 @@ public class BankService{
 
             con.commit();
 
-            logger.info(
+            BankService.logger.info(
                 "Transfer successful from={} to={} amount={}",
                 senderAccountNumber,
                 receiverAccountNumber,
@@ -319,27 +319,25 @@ public class BankService{
             return "Success";
 
         } catch (Exception e) {
-
             if (con != null) {
                 try {
                     con.rollback();
-                    logger.error("Transfer rolled back.");
+                    BankService.logger.error("Transfer rolled back.");
                 } catch (Exception rollbackEx) {
-                    logger.error("Rollback failed", rollbackEx);
+                    BankService.logger.error("Rollback failed", rollbackEx);
                 }
             }
 
-            logger.error("Transfer failed", e);
+            BankService.logger.error("Transfer failed", e);
             return e.getMessage();
 
         } finally {
-
             if (con != null) {
                 try {
                     con.setAutoCommit(true);
                     con.close();
                 } catch (Exception e) {
-                    logger.error("Connection close error", e);
+                    BankService.logger.error("Connection close error", e);
                 }
             }
         }

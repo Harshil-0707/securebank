@@ -18,14 +18,6 @@ public class CreateAccountData{
 
     // setter
 
-    public void setBalance(BigDecimal balance){
-        this.balance = balance;
-    }
-
-    public void setAccountType(String accountType){
-        this.accountType = accountType;
-    }
-
     public void setUserId(int userId){
         this.userId = userId;
     }

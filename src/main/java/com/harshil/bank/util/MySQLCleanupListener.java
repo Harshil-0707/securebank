@@ -36,7 +36,5 @@ public class MySQLCleanupListener implements ServletContextListener {
     }
 
     @Override
-    public void contextInitialized(ServletContextEvent sce) {
-        // nothing needed
-    }
+    public void contextInitialized(ServletContextEvent sce) {}
 }

@@ -188,9 +188,7 @@
                 .then(data => data.json())
                 .then((data) => {
                     if (data.message === "Success") {
-                        setTimeout(() => {
-                            window.location.href = "http://localhost:8080/securebank/create-account";
-                        }, 100);
+                        window.location.href = "http://localhost:8080/securebank/create-account";
                     } else {
                         deplicateError.textContent = data.message;
                     }

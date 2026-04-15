@@ -67,12 +67,11 @@ public class UserDAO{
                     return user;
                 }
             }catch(Exception e){
-                e.printStackTrace();
+                UserDAO.logger.error("Error getting user:: ",e);
             }
 
         }catch(Exception e){
-            UserDAO.logger.error("Error logging in user",e);
-            e.printStackTrace();
+            UserDAO.logger.error("Error logging in user:: ",e);
         }
         return null;
     }
@@ -117,7 +116,6 @@ public class UserDAO{
             return rs.next();
         }catch(Exception e){
             UserDAO.logger.error("Error getting user by field name = {} and value = {}",fieldName,value,e);
-            e.printStackTrace();
         }
         return false;
     }

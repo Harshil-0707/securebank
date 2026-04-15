@@ -35,21 +35,8 @@ public class AccountDAO{
             rowsAffected = ps.executeUpdate();
         }catch(Exception e){
             AccountDAO.logger.error("Account creation Error: ",e);
-            e.printStackTrace();
         }
         return rowsAffected > 0;
-    }
-
-    public boolean existsBy(String fieldName,String value){
-        String sql = "SELECT 1 FROM accounts WHERE " + fieldName + " = ?";
-        try(PreparedStatement ps = con.prepareStatement(sql)){
-            ps.setString(1,value);
-            ResultSet rs = ps.executeQuery();
-            return rs.next();
-        }catch(Exception e){
-            AccountDAO.logger.error("Error in finding record using field name={} and value={}",fieldName,value,e);
-        }
-        return false;
     }
 
     public boolean updateBalance(BigDecimal amount,String accountNumber,String transactionType){
@@ -110,37 +97,11 @@ public class AccountDAO{
             try(ResultSet rs = ps.executeQuery()){
                 if(rs.next()) return rs.getBigDecimal("balance");
             }catch(Exception e){
-                AccountDAO.logger.error("Error setting balance for account number={}",accountNumber,e);
-                e.printStackTrace();
+                AccountDAO.logger.error("Error setting balance for account number = {}",accountNumber,e);
             }
         }catch(Exception e){
-            AccountDAO.logger.error("Error etting balance using account number={}",accountNumber,e);
-            e.printStackTrace();
+            AccountDAO.logger.error("Error getting balance using account number = {}",accountNumber,e);
         }
         return new BigDecimal("0.0");
-    }
-
-    public Account checkBalance(String accountNumber){
-        String sql = "SELECT * FROM accounts WHERE account_number = ?";
-        Account a = null;
-        try(PreparedStatement ps = con.prepareStatement(sql)){
-            ps.setString(1,accountNumber);
-            try(ResultSet rs = ps.executeQuery()){
-                if(rs.next()){
-                    int userId = rs.getInt("user_id");
-                    String accountType = rs.getString("account_type");
-                    BigDecimal balance = rs.getBigDecimal("balance");
-                    a = new Account(userId,accountType,balance);
-                    a.setAccountNumber(accountNumber);
-                }
-            }catch(Exception e){
-                AccountDAO.logger.error("Error setting account details for account number={}",accountNumber,e);
-                e.printStackTrace();
-            }
-        }catch(Exception e){
-            AccountDAO.logger.error("Checking balance for account={}",accountNumber,e);
-            e.printStackTrace();
-        }
-        return a;
     }
 }
